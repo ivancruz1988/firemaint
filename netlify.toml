@@ -1,0 +1,19 @@
+# Configuracion de despliegue en Netlify.
+#
+# Netlify no trae Flutter preinstalado, asi que el SDK se descarga en cada
+# build desde netlify-build.sh. Las credenciales de Supabase se toman de las
+# variables de entorno configuradas en el panel de Netlify (nunca del repo).
+
+[build]
+  command = "bash netlify-build.sh"
+  publish = "build/web"
+
+[build.environment]
+  FLUTTER_VERSION = "3.44.6"
+
+# La navegacion la resuelve go_router del lado del cliente: cualquier ruta
+# debe servir index.html en lugar de devolver 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

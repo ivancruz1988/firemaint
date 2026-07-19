@@ -187,7 +187,7 @@ class _AvisoTareasPendientes extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.go('/ordenes'),
+          onTap: () => context.go('/ordenes-trabajo'),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(

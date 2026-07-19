@@ -68,6 +68,23 @@ class SupabaseUsuarioRepository implements UsuarioRepository {
   }
 
   @override
+  Future<void> actualizarUsuario({
+    required String id,
+    required String nombreCompleto,
+    required UserRole rol,
+    String? telefono,
+  }) async {
+    // La tabla guarda rol_id, no el nombre del rol: hay que resolverlo antes.
+    final rolRow = await _client.from('roles').select('id').eq('nombre', rol.toDb()).single();
+
+    await _client.from('usuarios').update({
+      'nombre_completo': nombreCompleto,
+      'rol_id': rolRow['id'],
+      'telefono': telefono,
+    }).eq('id', id);
+  }
+
+  @override
   Future<void> setActivo(String id, {required bool activo}) async {
     // Las reglas (solo admin, no autodesactivarse) las hace cumplir el trigger
     // trg_proteger_campos_usuario en la base: no dependen del cliente.

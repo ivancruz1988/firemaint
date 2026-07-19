@@ -64,10 +64,8 @@ class ConfiguracionScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           FireCard(
-            onTap: () => showDialog(
-              context: context,
-              builder: (_) => const CambiarPasswordDialog(),
-            ),
+            onTap: () =>
+                showDialog(context: context, builder: (_) => const CambiarPasswordDialog()),
             child: const Row(
               children: [
                 Icon(Icons.lock_outline, color: AppColors.textoPrincipal),

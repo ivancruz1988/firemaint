@@ -45,9 +45,7 @@ class UsuariosAdminScreen extends ConsumerWidget {
     Usuario usuario, {
     required bool activo,
   }) async {
-    await ref
-        .read(usuariosAdminControllerProvider.notifier)
-        .setActivo(usuario.id, activo: activo);
+    await ref.read(usuariosAdminControllerProvider.notifier).setActivo(usuario.id, activo: activo);
 
     if (!context.mounted) return;
     final estado = ref.read(usuariosAdminControllerProvider);
@@ -59,8 +57,8 @@ class UsuariosAdminScreen extends ConsumerWidget {
           estado.hasError
               ? 'No se pudo aplicar el cambio: ${estado.error}'
               : activo
-                  ? '${usuario.nombreCompleto} fue reactivado'
-                  : '${usuario.nombreCompleto} fue dado de baja',
+              ? '${usuario.nombreCompleto} fue reactivado'
+              : '${usuario.nombreCompleto} fue dado de baja',
         ),
       ),
     );
@@ -121,16 +119,29 @@ class UsuariosAdminScreen extends ConsumerWidget {
                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                       ),
                     ),
-                    PopupMenuButton<bool>(
+                    PopupMenuButton<_AccionUsuario>(
                       tooltip: 'Acciones',
                       icon: const Icon(Icons.more_vert, color: AppColors.textoTenue),
-                      onSelected: (activo) => activo
-                          ? _aplicar(context, ref, usuario, activo: true)
-                          : _confirmarBaja(context, ref, usuario),
+                      onSelected: (accion) => switch (accion) {
+                        _AccionUsuario.editar => showDialog(
+                          context: context,
+                          builder: (_) => UsuarioFormDialog(usuario: usuario),
+                        ),
+                        _AccionUsuario.reactivar => _aplicar(context, ref, usuario, activo: true),
+                        _AccionUsuario.darDeBaja => _confirmarBaja(context, ref, usuario),
+                      },
                       itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          value: _AccionUsuario.editar,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Icon(Icons.edit_outlined),
+                            title: Text('Editar'),
+                          ),
+                        ),
                         if (inactivo)
                           const PopupMenuItem(
-                            value: true,
+                            value: _AccionUsuario.reactivar,
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
                               leading: Icon(Icons.person_add_alt, color: AppColors.exito),
@@ -139,7 +150,7 @@ class UsuariosAdminScreen extends ConsumerWidget {
                           )
                         else
                           const PopupMenuItem(
-                            value: false,
+                            value: _AccionUsuario.darDeBaja,
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
                               leading: Icon(Icons.person_off_outlined, color: AppColors.critico),
@@ -160,3 +171,5 @@ class UsuariosAdminScreen extends ConsumerWidget {
     );
   }
 }
+
+enum _AccionUsuario { editar, reactivar, darDeBaja }

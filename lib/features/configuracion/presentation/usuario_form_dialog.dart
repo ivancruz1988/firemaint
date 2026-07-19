@@ -4,12 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/widgets/fire_button.dart';
 import '../../../domain/entities/enums.dart';
+import '../../../domain/entities/usuario.dart';
 import '../application/usuarios_admin_providers.dart';
 
-/// Formulario para que un administrador cree un nuevo usuario (invoca la
-/// Edge Function `create-user`, ya que requiere la service role key).
+/// Alta y edicion de usuarios por parte de un administrador.
+///
+/// El alta invoca la Edge Function `create-user` (necesita la service role
+/// key). La edicion escribe directo en la tabla, donde las reglas de la base
+/// ya limitan quien puede tocar el rol.
 class UsuarioFormDialog extends ConsumerStatefulWidget {
-  const UsuarioFormDialog({super.key});
+  const UsuarioFormDialog({super.key, this.usuario});
+
+  /// Si viene, el dialogo edita ese usuario en lugar de crear uno nuevo.
+  final Usuario? usuario;
 
   @override
   ConsumerState<UsuarioFormDialog> createState() => _UsuarioFormDialogState();
@@ -17,12 +24,24 @@ class UsuarioFormDialog extends ConsumerStatefulWidget {
 
 class _UsuarioFormDialogState extends ConsumerState<UsuarioFormDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _nombreController = TextEditingController();
-  final _emailController = TextEditingController();
+  late final TextEditingController _nombreController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _telefonoController;
   final _passwordController = TextEditingController();
-  final _telefonoController = TextEditingController();
-  UserRole _rol = UserRole.tecnico;
+  late UserRole _rol;
   bool _guardando = false;
+
+  bool get _esEdicion => widget.usuario != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final u = widget.usuario;
+    _nombreController = TextEditingController(text: u?.nombreCompleto ?? '');
+    _emailController = TextEditingController(text: u?.email ?? '');
+    _telefonoController = TextEditingController(text: u?.telefono ?? '');
+    _rol = u?.rol ?? UserRole.tecnico;
+  }
 
   @override
   void dispose() {
@@ -36,20 +55,39 @@ class _UsuarioFormDialogState extends ConsumerState<UsuarioFormDialog> {
   Future<void> _guardar() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _guardando = true);
+
+    final repo = ref.read(usuarioRepositoryProvider);
+    final telefono = _telefonoController.text.trim().isEmpty
+        ? null
+        : _telefonoController.text.trim();
+
     try {
-      await ref.read(usuarioRepositoryProvider).crearUsuario(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-            nombreCompleto: _nombreController.text.trim(),
-            rol: _rol,
-            telefono: _telefonoController.text.trim().isEmpty ? null : _telefonoController.text.trim(),
-          );
+      if (_esEdicion) {
+        await repo.actualizarUsuario(
+          id: widget.usuario!.id,
+          nombreCompleto: _nombreController.text.trim(),
+          rol: _rol,
+          telefono: telefono,
+        );
+      } else {
+        await repo.crearUsuario(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          nombreCompleto: _nombreController.text.trim(),
+          rol: _rol,
+          telefono: telefono,
+        );
+      }
       ref.invalidate(usuariosProvider);
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo crear el usuario: $e')),
+          SnackBar(
+            content: Text(
+              _esEdicion ? 'No se pudo guardar el cambio: $e' : 'No se pudo crear el usuario: $e',
+            ),
+          ),
         );
       }
     } finally {
@@ -60,7 +98,7 @@ class _UsuarioFormDialogState extends ConsumerState<UsuarioFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Nuevo usuario'),
+      title: Text(_esEdicion ? 'Editar usuario' : 'Nuevo usuario'),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -75,18 +113,25 @@ class _UsuarioFormDialogState extends ConsumerState<UsuarioFormDialog> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Correo electronico *'),
+                // El correo identifica la cuenta en auth.users: cambiarlo solo
+                // en esta tabla dejaria al usuario sin poder iniciar sesion.
+                enabled: !_esEdicion,
+                decoration: InputDecoration(
+                  labelText: 'Correo electronico *',
+                  helperText: _esEdicion ? 'El correo no se puede modificar' : null,
+                ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Requerido' : null,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Contrasena temporal *'),
-                obscureText: true,
-                validator: (v) =>
-                    (v == null || v.length < 6) ? 'Minimo 6 caracteres' : null,
-              ),
+              if (!_esEdicion) ...[
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Contrasena temporal *'),
+                  obscureText: true,
+                  validator: (v) => (v == null || v.length < 6) ? 'Minimo 6 caracteres' : null,
+                ),
+              ],
               const SizedBox(height: 10),
               TextFormField(
                 controller: _telefonoController,
@@ -113,7 +158,11 @@ class _UsuarioFormDialogState extends ConsumerState<UsuarioFormDialog> {
           child: const Text('Cancelar'),
         ),
         FireButton.primary(
-          label: _guardando ? 'Creando...' : 'Crear',
+          label: _guardando
+              ? 'Guardando...'
+              : _esEdicion
+              ? 'Guardar'
+              : 'Crear',
           expand: false,
           onPressed: _guardando ? null : _guardar,
         ),

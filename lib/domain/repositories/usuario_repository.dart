@@ -17,4 +17,14 @@ abstract class UsuarioRepository {
   /// Da de baja (o reactiva) un usuario. Se usa baja logica en lugar de
   /// borrado para no perder el historial de trabajos que cargo. Solo admin.
   Future<void> setActivo(String id, {required bool activo});
+
+  /// Corrige los datos de un usuario ya creado. El correo no se incluye:
+  /// vive en auth.users y cambiarlo solo aca dejaria las dos tablas
+  /// desincronizadas.
+  Future<void> actualizarUsuario({
+    required String id,
+    required String nombreCompleto,
+    required UserRole rol,
+    String? telefono,
+  });
 }

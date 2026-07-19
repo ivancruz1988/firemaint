@@ -34,17 +34,13 @@ class _CambiarPasswordDialogState extends ConsumerState<CambiarPasswordDialog> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _guardando = true);
     try {
-      await ref.read(authControllerProvider.notifier).cambiarPassword(
-            actual: _actualController.text,
-            nueva: _nuevaController.text,
-          );
+      await ref
+          .read(authControllerProvider.notifier)
+          .cambiarPassword(actual: _actualController.text, nueva: _nuevaController.text);
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppColors.exito,
-          content: Text('Contrasena actualizada'),
-        ),
+        const SnackBar(backgroundColor: AppColors.exito, content: Text('Contrasena actualizada')),
       );
     } catch (e) {
       if (!mounted) return;
@@ -53,9 +49,9 @@ class _CambiarPasswordDialogState extends ConsumerState<CambiarPasswordDialog> {
       final mensaje = e.toString().contains('Invalid login credentials')
           ? 'La contrasena actual no es correcta'
           : 'No se pudo cambiar la contrasena: $e';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: AppColors.critico, content: Text(mensaje)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(backgroundColor: AppColors.critico, content: Text(mensaje)));
     } finally {
       if (mounted) setState(() => _guardando = false);
     }

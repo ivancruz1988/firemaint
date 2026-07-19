@@ -13,7 +13,8 @@ import '../../../domain/entities/vehiculo.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../dashboard/application/dashboard_providers.dart';
 import '../application/vehiculos_providers.dart';
-import 'widgets/adjuntos_section.dart';
+import '../../../core/widgets/adjuntos_section.dart';
+import '../../../domain/entities/padre_archivo.dart';
 
 class VehiculoDetailScreen extends ConsumerWidget {
   const VehiculoDetailScreen({super.key, required this.vehiculoId});
@@ -74,7 +75,7 @@ class VehiculoDetailScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _SeccionUso(vehiculo: vehiculo),
               const SizedBox(height: 12),
-              AdjuntosSection(vehiculoId: vehiculo.id),
+              AdjuntosSection(padre: PadreArchivo.vehiculo(vehiculo.id)),
             ],
           );
         },
@@ -99,8 +100,10 @@ class _SeccionIdentificacion extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text('${vehiculo.numeroInterno} — ${vehiculo.marca} ${vehiculo.modelo}',
-                    style: AppTextStyles.headline),
+                child: Text(
+                  '${vehiculo.numeroInterno} — ${vehiculo.marca} ${vehiculo.modelo}',
+                  style: AppTextStyles.headline,
+                ),
               ),
               StatusBadge.estadoOperativo(vehiculo.estadoOperativo.toDb()),
             ],
@@ -154,7 +157,9 @@ class _Fila extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(width: 150, child: Text(etiqueta, style: AppTextStyles.label)),
-          Expanded(child: Text(valor, style: AppTextStyles.body.copyWith(color: AppColors.textoPrincipal))),
+          Expanded(
+            child: Text(valor, style: AppTextStyles.body.copyWith(color: AppColors.textoPrincipal)),
+          ),
         ],
       ),
     );

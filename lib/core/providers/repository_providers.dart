@@ -6,7 +6,7 @@ import '../../data/repositories/supabase_novedad_repository.dart';
 import '../../data/repositories/supabase_orden_trabajo_repository.dart';
 import '../../data/repositories/supabase_repuesto_repository.dart';
 import '../../data/repositories/supabase_usuario_repository.dart';
-import '../../data/repositories/supabase_vehiculo_archivo_repository.dart';
+import '../../data/repositories/supabase_archivo_repository.dart';
 import '../../data/repositories/supabase_vehiculo_repository.dart';
 import '../../domain/repositories/checklist_repository.dart';
 import '../../domain/repositories/mantenimiento_programado_repository.dart';
@@ -14,7 +14,7 @@ import '../../domain/repositories/novedad_repository.dart';
 import '../../domain/repositories/orden_trabajo_repository.dart';
 import '../../domain/repositories/repuesto_repository.dart';
 import '../../domain/repositories/usuario_repository.dart';
-import '../../domain/repositories/vehiculo_archivo_repository.dart';
+import '../../domain/repositories/archivo_repository.dart';
 import '../../domain/repositories/vehiculo_repository.dart';
 import '../supabase/supabase_client_provider.dart';
 
@@ -26,8 +26,8 @@ final vehiculoRepositoryProvider = Provider<VehiculoRepository>((ref) {
   return SupabaseVehiculoRepository(ref.watch(supabaseClientProvider));
 });
 
-final vehiculoArchivoRepositoryProvider = Provider<VehiculoArchivoRepository>((ref) {
-  return SupabaseVehiculoArchivoRepository(ref.watch(supabaseClientProvider));
+final archivoRepositoryProvider = Provider<ArchivoRepository>((ref) {
+  return SupabaseArchivoRepository(ref.watch(supabaseClientProvider));
 });
 
 final ordenTrabajoRepositoryProvider = Provider<OrdenTrabajoRepository>((ref) {
@@ -46,7 +46,8 @@ final checklistRepositoryProvider = Provider<ChecklistRepository>((ref) {
   return SupabaseChecklistRepository(ref.watch(supabaseClientProvider));
 });
 
-final mantenimientoProgramadoRepositoryProvider =
-    Provider<MantenimientoProgramadoRepository>((ref) {
+final mantenimientoProgramadoRepositoryProvider = Provider<MantenimientoProgramadoRepository>((
+  ref,
+) {
   return SupabaseMantenimientoProgramadoRepository(ref.watch(supabaseClientProvider));
 });

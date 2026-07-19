@@ -6,18 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../core/providers/repository_providers.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/theme/widgets/fire_card.dart';
-import '../../../../domain/entities/archivo.dart';
-import '../../../../domain/entities/enums.dart';
-import '../../application/vehiculos_providers.dart';
+import '../providers/repository_providers.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+import '../theme/widgets/fire_card.dart';
+import '../../domain/entities/archivo.dart';
+import '../../domain/entities/enums.dart';
+import '../../domain/entities/padre_archivo.dart';
+import '../providers/archivos_providers.dart';
 
 class AdjuntosSection extends ConsumerStatefulWidget {
-  const AdjuntosSection({super.key, required this.vehiculoId});
+  const AdjuntosSection({super.key, required this.padre});
 
-  final String vehiculoId;
+  final PadreArchivo padre;
 
   @override
   ConsumerState<AdjuntosSection> createState() => _AdjuntosSectionState();
@@ -47,18 +48,21 @@ class _AdjuntosSectionState extends ConsumerState<AdjuntosSection> {
   Future<void> _subir(Uint8List bytes, String nombre, TipoArchivo tipo, String? mimeType) async {
     setState(() => _subiendo = true);
     try {
-      await ref.read(vehiculoArchivoRepositoryProvider).subir(
-            vehiculoId: widget.vehiculoId,
+      await ref
+          .read(archivoRepositoryProvider)
+          .subir(
+            padre: widget.padre,
             bytes: bytes,
             nombreOriginal: nombre,
             tipoArchivo: tipo,
             mimeType: mimeType,
           );
-      ref.invalidate(vehiculoArchivosProvider(widget.vehiculoId));
+      ref.invalidate(archivosDePadreProvider(widget.padre));
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo subir el archivo: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo subir el archivo: $e')));
       }
     } finally {
       if (mounted) setState(() => _subiendo = false);
@@ -66,13 +70,13 @@ class _AdjuntosSectionState extends ConsumerState<AdjuntosSection> {
   }
 
   Future<void> _eliminar(Archivo archivo) async {
-    await ref.read(vehiculoArchivoRepositoryProvider).eliminar(archivo);
-    ref.invalidate(vehiculoArchivosProvider(widget.vehiculoId));
+    await ref.read(archivoRepositoryProvider).eliminar(archivo);
+    ref.invalidate(archivosDePadreProvider(widget.padre));
   }
 
   @override
   Widget build(BuildContext context) {
-    final archivosAsync = ref.watch(vehiculoArchivosProvider(widget.vehiculoId));
+    final archivosAsync = ref.watch(archivosDePadreProvider(widget.padre));
 
     return FireCard(
       child: Column(
@@ -82,7 +86,9 @@ class _AdjuntosSectionState extends ConsumerState<AdjuntosSection> {
             children: [
               const Icon(Icons.attach_file, color: AppColors.textoPrincipal),
               const SizedBox(width: 8),
-              const Expanded(child: Text('Fotos, manuales y documentacion', style: AppTextStyles.title)),
+              const Expanded(
+                child: Text('Fotos, manuales y documentacion', style: AppTextStyles.title),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -105,10 +111,8 @@ class _AdjuntosSectionState extends ConsumerState<AdjuntosSection> {
               ),
             ],
           ),
-          if (_subiendo) const Padding(
-            padding: EdgeInsets.only(top: 12),
-            child: LinearProgressIndicator(),
-          ),
+          if (_subiendo)
+            const Padding(padding: EdgeInsets.only(top: 12), child: LinearProgressIndicator()),
           const SizedBox(height: 12),
           archivosAsync.when(
             data: (archivos) {
@@ -121,7 +125,9 @@ class _AdjuntosSectionState extends ConsumerState<AdjuntosSection> {
               return Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: archivos.map((a) => _ArchivoTile(archivo: a, onDelete: () => _eliminar(a))).toList(),
+                children: archivos
+                    .map((a) => _ArchivoTile(archivo: a, onDelete: () => _eliminar(a)))
+                    .toList(),
               );
             },
             loading: () => const Padding(
@@ -150,7 +156,7 @@ class _ArchivoTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder<String>(
-      future: ref.read(vehiculoArchivoRepositoryProvider).signedUrl(archivo.storagePath),
+      future: ref.read(archivoRepositoryProvider).signedUrl(archivo.storagePath),
       builder: (context, snapshot) {
         final url = snapshot.data;
         return Stack(

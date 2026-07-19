@@ -5,13 +5,17 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/archivo.dart';
 import '../../domain/entities/enums.dart';
-import '../../domain/repositories/vehiculo_archivo_repository.dart';
+import '../../domain/entities/padre_archivo.dart';
+import '../../domain/repositories/archivo_repository.dart';
 
+/// El bucket conserva el nombre original de cuando solo guardaba adjuntos de
+/// vehiculos. Renombrarlo obligaria a migrar los archivos ya subidos, asi que
+/// se separan por carpeta en lugar de por bucket.
 const _bucket = 'vehiculo-adjuntos';
 const _uuid = Uuid();
 
-class SupabaseVehiculoArchivoRepository implements VehiculoArchivoRepository {
-  SupabaseVehiculoArchivoRepository(this._client);
+class SupabaseArchivoRepository implements ArchivoRepository {
+  SupabaseArchivoRepository(this._client);
 
   final SupabaseClient _client;
 
@@ -19,6 +23,9 @@ class SupabaseVehiculoArchivoRepository implements VehiculoArchivoRepository {
     return Archivo(
       id: map['id'] as String,
       vehiculoId: map['vehiculo_id'] as String?,
+      ordenTrabajoId: map['orden_trabajo_id'] as String?,
+      novedadId: map['novedad_id'] as String?,
+      checklistItemId: map['checklist_item_id'] as String?,
       tipoArchivo: TipoArchivo.fromDb(map['tipo_archivo'] as String),
       storagePath: map['storage_path'] as String,
       nombreOriginal: map['nombre_original'] as String?,
@@ -29,24 +36,24 @@ class SupabaseVehiculoArchivoRepository implements VehiculoArchivoRepository {
   }
 
   @override
-  Future<List<Archivo>> getByVehiculo(String vehiculoId) async {
+  Future<List<Archivo>> getByPadre(PadreArchivo padre) async {
     final rows = await _client
         .from('archivos')
         .select()
-        .eq('vehiculo_id', vehiculoId)
+        .eq(padre.tipo.columna, padre.id)
         .order('fecha_creacion', ascending: false);
     return rows.map(_fromMap).toList();
   }
 
   @override
   Future<Archivo> subir({
-    required String vehiculoId,
+    required PadreArchivo padre,
     required Uint8List bytes,
     required String nombreOriginal,
     required TipoArchivo tipoArchivo,
     String? mimeType,
   }) async {
-    final path = '$vehiculoId/${_uuid.v4()}_$nombreOriginal';
+    final path = '${padre.carpetaStorage}/${_uuid.v4()}_$nombreOriginal';
     await _client.storage.from(_bucket).uploadBinary(
           path,
           bytes,
@@ -56,7 +63,7 @@ class SupabaseVehiculoArchivoRepository implements VehiculoArchivoRepository {
     final row = await _client
         .from('archivos')
         .insert({
-          'vehiculo_id': vehiculoId,
+          padre.tipo.columna: padre.id,
           'tipo_archivo': tipoArchivo.toDb(),
           'storage_path': path,
           'nombre_original': nombreOriginal,

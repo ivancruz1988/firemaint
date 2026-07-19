@@ -32,13 +32,14 @@ class VehiculoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${vehiculo.numeroInterno} — ${vehiculo.marca} ${vehiculo.modelo}',
-                    style: AppTextStyles.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 2),
                 Text(
-                  vehiculo.dominio ?? 'Sin dominio',
-                  style: AppTextStyles.label,
+                  '${vehiculo.numeroInterno} — ${vehiculo.marca} ${vehiculo.modelo}',
+                  style: AppTextStyles.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
+                Text(vehiculo.dominio ?? 'Sin dominio', style: AppTextStyles.label),
               ],
             ),
           ),

@@ -94,8 +94,9 @@ class _VehiculoFormScreenState extends ConsumerState<VehiculoFormScreen> {
         horasBomba: double.tryParse(_horasBombaController.text.trim()) ?? 0,
         fechaAlta: _fechaAlta,
         estadoOperativo: _estado,
-        observaciones:
-            _observacionesController.text.trim().isEmpty ? null : _observacionesController.text.trim(),
+        observaciones: _observacionesController.text.trim().isEmpty
+            ? null
+            : _observacionesController.text.trim(),
         fechaCreacion: _original?.fechaCreacion ?? DateTime.now(),
         fechaModificacion: DateTime.now(),
       );
@@ -109,9 +110,9 @@ class _VehiculoFormScreenState extends ConsumerState<VehiculoFormScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo guardar el vehiculo: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar el vehiculo: $e')));
       }
     } finally {
       if (mounted) setState(() => _cargando = false);

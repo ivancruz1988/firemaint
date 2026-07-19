@@ -48,8 +48,9 @@ class _NovedadFormScreenState extends ConsumerState<NovedadFormScreen> {
   Future<void> _guardar() async {
     if (!_formKey.currentState!.validate()) return;
     if (_vehiculoId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Selecciona un vehiculo')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Selecciona un vehiculo')));
       return;
     }
     setState(() => _cargando = true);
@@ -59,8 +60,9 @@ class _NovedadFormScreenState extends ConsumerState<NovedadFormScreen> {
         vehiculoId: _vehiculoId!,
         tipo: _tipo,
         titulo: _tituloController.text.trim(),
-        descripcion:
-            _descripcionController.text.trim().isEmpty ? null : _descripcionController.text.trim(),
+        descripcion: _descripcionController.text.trim().isEmpty
+            ? null
+            : _descripcionController.text.trim(),
         fechaOcurrencia: _fechaOcurrencia,
         estado: _estado,
       );
@@ -69,8 +71,9 @@ class _NovedadFormScreenState extends ConsumerState<NovedadFormScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo guardar la novedad: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar la novedad: $e')));
       }
     } finally {
       if (mounted) setState(() => _cargando = false);
@@ -97,8 +100,10 @@ class _NovedadFormScreenState extends ConsumerState<NovedadFormScreen> {
                   for (final v in vehiculos)
                     DropdownMenuItem(
                       value: v.id,
-                      child: Text('${v.numeroInterno} · ${v.marca} ${v.modelo}',
-                          overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        '${v.numeroInterno} · ${v.marca} ${v.modelo}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                 ],
                 onChanged: (value) => setState(() => _vehiculoId = value),
@@ -112,7 +117,8 @@ class _NovedadFormScreenState extends ConsumerState<NovedadFormScreen> {
               initialValue: _tipo,
               decoration: const InputDecoration(labelText: 'Tipo *'),
               items: [
-                for (final t in TipoNovedad.values) DropdownMenuItem(value: t, child: Text(t.label)),
+                for (final t in TipoNovedad.values)
+                  DropdownMenuItem(value: t, child: Text(t.label)),
               ],
               onChanged: (value) => setState(() => _tipo = value!),
             ),

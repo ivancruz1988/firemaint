@@ -16,10 +16,10 @@ class NovedadesListScreen extends ConsumerWidget {
   const NovedadesListScreen({super.key});
 
   Color _colorEstado(EstadoNovedad estado) => switch (estado) {
-        EstadoNovedad.abierta => AppColors.critico,
-        EstadoNovedad.enAtencion => AppColors.alerta,
-        EstadoNovedad.resuelta => AppColors.exito,
-      };
+    EstadoNovedad.abierta => AppColors.critico,
+    EstadoNovedad.enAtencion => AppColors.alerta,
+    EstadoNovedad.resuelta => AppColors.exito,
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -21,7 +21,13 @@ class _VehiculoFiltrosBarState extends ConsumerState<VehiculoFiltrosBar> {
     super.dispose();
   }
 
-  void _actualizar({String? texto, TipoVehiculo? tipo, EstadoVehiculo? estado, bool clearTipo = false, bool clearEstado = false}) {
+  void _actualizar({
+    String? texto,
+    TipoVehiculo? tipo,
+    EstadoVehiculo? estado,
+    bool clearTipo = false,
+    bool clearEstado = false,
+  }) {
     final actual = ref.read(vehiculoFiltroProvider);
     ref.read(vehiculoFiltroProvider.notifier).state = VehiculoFiltro(
       texto: texto ?? actual.texto,

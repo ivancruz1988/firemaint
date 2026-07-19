@@ -7,8 +7,10 @@ import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/widgets/fire_card.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/adjuntos_section.dart';
 import '../../../domain/entities/enums.dart';
 import '../../../domain/entities/novedad.dart';
+import '../../../domain/entities/padre_archivo.dart';
 import '../../auth/application/auth_providers.dart';
 import '../application/novedades_providers.dart';
 
@@ -18,15 +20,20 @@ class NovedadDetailScreen extends ConsumerWidget {
   final String novedadId;
 
   Future<void> _cambiarEstado(
-      BuildContext context, WidgetRef ref, Novedad n, EstadoNovedad nuevo) async {
+    BuildContext context,
+    WidgetRef ref,
+    Novedad n,
+    EstadoNovedad nuevo,
+  ) async {
     try {
       await ref.read(novedadRepositoryProvider).upsert(n.copyWith(estado: nuevo));
       ref.invalidate(novedadByIdProvider(novedadId));
       ref.invalidate(novedadesListProvider);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
       }
     }
   }
@@ -39,9 +46,13 @@ class NovedadDetailScreen extends ConsumerWidget {
         content: const Text('Esta accion no se puede deshacer. Continuar?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Eliminar')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );
@@ -52,8 +63,9 @@ class NovedadDetailScreen extends ConsumerWidget {
       if (context.mounted) context.pop();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
       }
     }
   }
@@ -91,14 +103,20 @@ class NovedadDetailScreen extends ConsumerWidget {
                   children: [
                     _fila('Tipo', n.tipo.label),
                     _fila('Estado', n.estado.label),
-                    _fila('Vehiculo',
-                        vehiculo == null ? '—' : '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}'),
+                    _fila(
+                      'Vehiculo',
+                      vehiculo == null
+                          ? '—'
+                          : '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}',
+                    ),
                     _fila('Ocurrencia', formatDateTime(n.fechaOcurrencia)),
                     if (n.descripcion != null && n.descripcion!.isNotEmpty)
                       _fila('Descripcion', n.descripcion!),
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
+              AdjuntosSection(padre: PadreArchivo.novedad(n.id)),
               if (puedeGestionar) ...[
                 const SizedBox(height: 16),
                 Text('Cambiar estado', style: AppTextStyles.title),

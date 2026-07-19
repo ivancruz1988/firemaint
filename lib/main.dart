@@ -24,18 +24,18 @@ void main() async {
     publishableKey: SupabaseConfig.isConfigured ? SupabaseConfig.anonKey : 'placeholder-anon-key',
   );
 
-  runApp(const ProviderScope(child: FireMaintApp()));
+  runApp(const ProviderScope(child: AutomotoresApp()));
 }
 
-class FireMaintApp extends ConsumerWidget {
-  const FireMaintApp({super.key});
+class AutomotoresApp extends ConsumerWidget {
+  const AutomotoresApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'FireMaint',
+      title: 'Sistema de Gestion de Automotores',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark(),
       routerConfig: router,

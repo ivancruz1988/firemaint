@@ -12,7 +12,7 @@ void main() {
       ),
     );
 
-    expect(find.text('FireMaint'), findsOneWidget);
+    expect(find.text('Sistema de Gestion de Automotores'), findsOneWidget);
     expect(find.text('Ingresar'), findsOneWidget);
   });
 }

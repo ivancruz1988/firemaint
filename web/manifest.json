@@ -1,6 +1,6 @@
 {
-    "name": "FireMaint",
-    "short_name": "FireMaint",
+    "name": "Sistema de Gestion de Automotores",
+    "short_name": "Automotores",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#121417",

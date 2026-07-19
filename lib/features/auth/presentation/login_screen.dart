@@ -79,17 +79,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'FireMaint',
+                      'Sistema de Gestion de Automotores',
                       textAlign: TextAlign.center,
                       style: TextStyle(
+                        // Menor que el nombre anterior: este ocupa dos renglones
+                        // y a 32 desbordaba la tarjeta en pantallas angostas.
                         color: AppColors.blanco,
-                        fontSize: 32,
+                        fontSize: 24,
                         fontWeight: FontWeight.w800,
+                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     const Text(
-                      'Gestion de mantenimiento de unidades',
+                      'Mantenimiento de unidades',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white70, fontSize: 14),
                     ),

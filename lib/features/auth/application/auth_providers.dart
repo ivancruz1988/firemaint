@@ -32,10 +32,10 @@ class AuthController extends Notifier<AsyncValue<void>> {
   Future<void> signInWithPassword(String email, String password) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(supabaseClientProvider).auth.signInWithPassword(
-            email: email,
-            password: password,
-          );
+      await ref
+          .read(supabaseClientProvider)
+          .auth
+          .signInWithPassword(email: email, password: password);
     });
   }
 
@@ -58,4 +58,6 @@ class AuthController extends Notifier<AsyncValue<void>> {
   }
 }
 
-final authControllerProvider = NotifierProvider<AuthController, AsyncValue<void>>(AuthController.new);
+final authControllerProvider = NotifierProvider<AuthController, AsyncValue<void>>(
+  AuthController.new,
+);

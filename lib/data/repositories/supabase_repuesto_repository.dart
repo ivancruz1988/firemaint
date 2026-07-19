@@ -96,7 +96,10 @@ class SupabaseRepuestoRepository implements RepuestoRepository {
 
   @override
   Future<void> registrarMovimiento(MovimientoStock movimiento) async {
-    // 1. Registrar el movimiento.
+    // El recalculo del stock lo hace un trigger en la base (migracion 0018),
+    // no el cliente: hacerlo aca requeria leer el stock y escribirlo en dos
+    // llamadas separadas, y dos movimientos casi simultaneos del mismo
+    // repuesto podian leer el mismo valor viejo y pisarse entre si.
     await _client.from('movimientos_stock').insert({
       'repuesto_id': movimiento.repuestoId,
       'tipo_movimiento': movimiento.tipoMovimiento.toDb(),
@@ -104,17 +107,5 @@ class SupabaseRepuestoRepository implements RepuestoRepository {
       'orden_trabajo_id': movimiento.ordenTrabajoId,
       'motivo': movimiento.motivo,
     });
-
-    // 2. Recalcular el stock del repuesto segun el tipo de movimiento.
-    final repuesto = await getById(movimiento.repuestoId);
-    if (repuesto == null) return;
-
-    final nuevoStock = switch (movimiento.tipoMovimiento) {
-      TipoMovimientoStock.ingreso => repuesto.stock + movimiento.cantidad,
-      TipoMovimientoStock.egreso => repuesto.stock - movimiento.cantidad,
-      TipoMovimientoStock.ajuste => movimiento.cantidad,
-    };
-
-    await _client.from('repuestos').update({'stock': nuevoStock}).eq('id', movimiento.repuestoId);
   }
 }

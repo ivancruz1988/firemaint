@@ -74,8 +74,12 @@ class SupabaseChecklistRepository implements ChecklistRepository {
       final row = await _client.from('checklists').insert(map).select().single();
       return _fromMap(row);
     }
-    final row =
-        await _client.from('checklists').update(map).eq('id', checklist.id).select().single();
+    final row = await _client
+        .from('checklists')
+        .update(map)
+        .eq('id', checklist.id)
+        .select()
+        .single();
     return _fromMap(row);
   }
 
@@ -102,8 +106,12 @@ class SupabaseChecklistRepository implements ChecklistRepository {
       final row = await _client.from('checklist_items').insert(map).select().single();
       return _itemFromMap(row);
     }
-    final row =
-        await _client.from('checklist_items').update(map).eq('id', item.id).select().single();
+    final row = await _client
+        .from('checklist_items')
+        .update(map)
+        .eq('id', item.id)
+        .select()
+        .single();
     return _itemFromMap(row);
   }
 

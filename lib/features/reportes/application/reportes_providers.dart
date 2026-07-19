@@ -28,8 +28,7 @@ class ReporteData {
 }
 
 final reporteDataProvider = FutureProvider<ReporteData>((ref) async {
-  final vehiculos =
-      await ref.watch(vehiculoRepositoryProvider).search(const VehiculoFiltro());
+  final vehiculos = await ref.watch(vehiculoRepositoryProvider).search(const VehiculoFiltro());
   final ots = await ref.watch(ordenTrabajoRepositoryProvider).getAll();
   final novedades = await ref.watch(novedadRepositoryProvider).getAll();
   final repuestos = await ref.watch(repuestoRepositoryProvider).getAll();
@@ -40,12 +39,15 @@ final reporteDataProvider = FutureProvider<ReporteData>((ref) async {
   }
 
   return ReporteData(
-    vehiculosOperativos:
-        vehiculos.where((v) => v.estadoOperativo == EstadoVehiculo.operativo).length,
-    vehiculosEnMantenimiento:
-        vehiculos.where((v) => v.estadoOperativo == EstadoVehiculo.enMantenimiento).length,
-    vehiculosFueraDeServicio:
-        vehiculos.where((v) => v.estadoOperativo == EstadoVehiculo.fueraDeServicio).length,
+    vehiculosOperativos: vehiculos
+        .where((v) => v.estadoOperativo == EstadoVehiculo.operativo)
+        .length,
+    vehiculosEnMantenimiento: vehiculos
+        .where((v) => v.estadoOperativo == EstadoVehiculo.enMantenimiento)
+        .length,
+    vehiculosFueraDeServicio: vehiculos
+        .where((v) => v.estadoOperativo == EstadoVehiculo.fueraDeServicio)
+        .length,
     otPorEstado: otPorEstado,
     novedadesAbiertas: novedades.where((n) => n.estado == EstadoNovedad.abierta).length,
     repuestosStockBajo: repuestos.where((r) => r.stockBajo).length,

@@ -54,11 +54,9 @@ class SupabaseArchivoRepository implements ArchivoRepository {
     String? mimeType,
   }) async {
     final path = '${padre.carpetaStorage}/${_uuid.v4()}_$nombreOriginal';
-    await _client.storage.from(_bucket).uploadBinary(
-          path,
-          bytes,
-          fileOptions: FileOptions(contentType: mimeType),
-        );
+    await _client.storage
+        .from(_bucket)
+        .uploadBinary(path, bytes, fileOptions: FileOptions(contentType: mimeType));
 
     final row = await _client
         .from('archivos')

@@ -53,8 +53,9 @@ class _ChecklistFormScreenState extends ConsumerState<ChecklistFormScreen> {
       final checklist = Checklist(
         id: _original?.id ?? '',
         nombre: _nombreController.text.trim(),
-        descripcion:
-            _descripcionController.text.trim().isEmpty ? null : _descripcionController.text.trim(),
+        descripcion: _descripcionController.text.trim().isEmpty
+            ? null
+            : _descripcionController.text.trim(),
         tipoVehiculo: _tipoVehiculo,
         activo: _activo,
       );
@@ -71,8 +72,9 @@ class _ChecklistFormScreenState extends ConsumerState<ChecklistFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo guardar el checklist: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar el checklist: $e')));
       }
     } finally {
       if (mounted) setState(() => _cargando = false);
@@ -129,9 +131,7 @@ class _ChecklistFormScreenState extends ConsumerState<ChecklistFormScreen> {
             DropdownButtonFormField<String>(
               initialValue: _tipoVehiculo,
               decoration: const InputDecoration(labelText: 'Aplica a tipo de vehiculo'),
-              items: [
-                for (final t in _tiposVehiculo) DropdownMenuItem(value: t, child: Text(t)),
-              ],
+              items: [for (final t in _tiposVehiculo) DropdownMenuItem(value: t, child: Text(t))],
               onChanged: (value) => setState(() => _tipoVehiculo = value!),
             ),
             const SizedBox(height: 12),

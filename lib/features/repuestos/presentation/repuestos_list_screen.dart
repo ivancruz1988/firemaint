@@ -76,8 +76,14 @@ class RepuestosListScreen extends ConsumerWidget {
                             ),
                           ),
                           if (r.stockBajo)
-                            const Text('Stock bajo',
-                                style: TextStyle(color: AppColors.critico, fontSize: 12, fontWeight: FontWeight.w700)),
+                            const Text(
+                              'Stock bajo',
+                              style: TextStyle(
+                                color: AppColors.critico,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                         ],
                       ),
                     ],

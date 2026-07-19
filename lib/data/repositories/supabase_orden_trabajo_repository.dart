@@ -22,7 +22,9 @@ class SupabaseOrdenTrabajoRepository implements OrdenTrabajoRepository {
       horasTrabajo: (map['horas_trabajo'] as num?)?.toDouble(),
       costoEstimado: (map['costo_estimado'] as num?)?.toDouble(),
       costoReal: (map['costo_real'] as num?)?.toDouble(),
-      fechaInicio: map['fecha_inicio'] == null ? null : DateTime.parse(map['fecha_inicio'] as String),
+      fechaInicio: map['fecha_inicio'] == null
+          ? null
+          : DateTime.parse(map['fecha_inicio'] as String),
       fechaFin: map['fecha_fin'] == null ? null : DateTime.parse(map['fecha_fin'] as String),
       observaciones: map['observaciones'] as String?,
       fechaCreacion: DateTime.parse(map['fecha_creacion'] as String),
@@ -48,7 +50,10 @@ class SupabaseOrdenTrabajoRepository implements OrdenTrabajoRepository {
 
   @override
   Future<List<OrdenTrabajo>> getAll() async {
-    final rows = await _client.from('ordenes_trabajo').select().order('numero_ot', ascending: false);
+    final rows = await _client
+        .from('ordenes_trabajo')
+        .select()
+        .order('numero_ot', ascending: false);
     return rows.map(_fromMap).toList();
   }
 

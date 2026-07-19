@@ -40,8 +40,7 @@ class SupabaseMantenimientoProgramadoRepository implements MantenimientoPrograma
 
   @override
   Future<List<MantenimientoProgramado>> getAll() async {
-    final rows =
-        await _client.from('mantenimientos_programados').select().order('proxima_fecha');
+    final rows = await _client.from('mantenimientos_programados').select().order('proxima_fecha');
     return rows.map(_fromMap).toList();
   }
 
@@ -67,8 +66,11 @@ class SupabaseMantenimientoProgramadoRepository implements MantenimientoPrograma
 
   @override
   Future<MantenimientoProgramado?> getById(String id) async {
-    final row =
-        await _client.from('mantenimientos_programados').select().eq('id', id).maybeSingle();
+    final row = await _client
+        .from('mantenimientos_programados')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
     if (row == null) return null;
     return _fromMap(row);
   }
@@ -77,8 +79,7 @@ class SupabaseMantenimientoProgramadoRepository implements MantenimientoPrograma
   Future<MantenimientoProgramado> upsert(MantenimientoProgramado mantenimiento) async {
     final map = _toMap(mantenimiento);
     if (mantenimiento.id.isEmpty) {
-      final row =
-          await _client.from('mantenimientos_programados').insert(map).select().single();
+      final row = await _client.from('mantenimientos_programados').insert(map).select().single();
       return _fromMap(row);
     }
     final row = await _client

@@ -10,6 +10,7 @@ import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../mantenimiento_preventivo/application/mantenimiento_providers.dart';
 import '../../ordenes_trabajo/application/ordenes_trabajo_providers.dart';
+import '../../repuestos/application/repuestos_providers.dart';
 import '../application/dashboard_providers.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -41,6 +42,7 @@ class DashboardScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
                 const _AvisoTareasPendientes(),
                 const _AvisoMantenimientoVencido(),
+                const _AvisoStockBajo(),
                 kpisAsync.when(
                   data: (kpis) => LayoutBuilder(
                     builder: (context, constraints) {
@@ -281,6 +283,70 @@ class _AvisoMantenimientoVencido extends ConsumerWidget {
                   ),
                 ),
                 const Icon(Icons.chevron_right, color: AppColors.critico),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Aviso de repuestos en o por debajo del stock minimo. Solo visible para
+/// quien puede gestionar el deposito (admin/jefe de taller): un tecnico no
+/// tiene permiso para registrar una reposicion.
+class _AvisoStockBajo extends ConsumerWidget {
+  const _AvisoStockBajo();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rol = ref.watch(currentRoleProvider);
+    final puedeGestionar = rol == UserRole.administrador || rol == UserRole.jefeTaller;
+    if (!puedeGestionar) return const SizedBox.shrink();
+
+    final bajos = ref.watch(repuestosStockBajoProvider).value ?? const [];
+    if (bajos.isEmpty) return const SizedBox.shrink();
+
+    final cantidad = bajos.length;
+    final esUno = cantidad == 1;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: AppColors.alerta.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.go('/repuestos'),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                const Icon(Icons.inventory_2_outlined, color: AppColors.alerta),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        esUno
+                            ? 'Hay 1 repuesto con stock bajo'
+                            : 'Hay $cantidad repuestos con stock bajo',
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        esUno
+                            ? '${bajos.first.codigo} - ${bajos.first.descripcion}'
+                            : 'Toca para ver el deposito',
+                        style: AppTextStyles.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppColors.alerta),
               ],
             ),
           ),

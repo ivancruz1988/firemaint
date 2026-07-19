@@ -73,7 +73,10 @@ class AppTheme {
         // mismo tono se perderia el limite entre uno y otro.
         fillColor: AppColors.relleno,
         labelStyle: const TextStyle(color: AppColors.textoTenue, fontWeight: FontWeight.w500),
-        floatingLabelStyle: const TextStyle(color: AppColors.rojoClaro, fontWeight: FontWeight.w700),
+        floatingLabelStyle: const TextStyle(
+          color: AppColors.rojoClaro,
+          fontWeight: FontWeight.w700,
+        ),
         prefixIconColor: AppColors.textoTenue,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -115,11 +118,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.borde,
-        thickness: 1,
-        space: 24,
-      ),
+      dividerTheme: const DividerThemeData(color: AppColors.borde, thickness: 1, space: 24),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.rojoBombero,
         foregroundColor: AppColors.blanco,
@@ -129,8 +128,10 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.relleno,
-        contentTextStyle:
-            const TextStyle(color: AppColors.textoPrincipal, fontWeight: FontWeight.w500),
+        contentTextStyle: const TextStyle(
+          color: AppColors.textoPrincipal,
+          fontWeight: FontWeight.w500,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       dialogTheme: DialogThemeData(
@@ -160,10 +161,16 @@ class AppTheme {
         indicatorColor: AppColors.rojoClaro.withValues(alpha: 0.20),
         selectedIconTheme: const IconThemeData(color: AppColors.rojoClaro),
         unselectedIconTheme: const IconThemeData(color: AppColors.textoTenue),
-        selectedLabelTextStyle:
-            const TextStyle(color: AppColors.rojoClaro, fontWeight: FontWeight.w700, fontSize: 12),
-        unselectedLabelTextStyle:
-            const TextStyle(color: AppColors.textoTenue, fontWeight: FontWeight.w500, fontSize: 12),
+        selectedLabelTextStyle: const TextStyle(
+          color: AppColors.rojoClaro,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+        unselectedLabelTextStyle: const TextStyle(
+          color: AppColors.textoTenue,
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
       ),
     );
   }

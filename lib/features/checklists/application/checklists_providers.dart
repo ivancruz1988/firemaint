@@ -12,6 +12,9 @@ final checklistByIdProvider = FutureProvider.family<Checklist?, String>((ref, id
   return ref.watch(checklistRepositoryProvider).getById(id);
 });
 
-final checklistItemsProvider = FutureProvider.family<List<ChecklistItem>, String>((ref, checklistId) {
+final checklistItemsProvider = FutureProvider.family<List<ChecklistItem>, String>((
+  ref,
+  checklistId,
+) {
   return ref.watch(checklistRepositoryProvider).getItems(checklistId);
 });

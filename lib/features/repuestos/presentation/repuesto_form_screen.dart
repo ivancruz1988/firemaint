@@ -65,8 +65,12 @@ class _RepuestoFormScreenState extends ConsumerState<RepuestoFormScreen> {
         descripcion: _descripcionController.text.trim(),
         stock: double.tryParse(_stockController.text.trim()) ?? 0,
         stockMinimo: double.tryParse(_stockMinimoController.text.trim()) ?? 0,
-        ubicacion: _ubicacionController.text.trim().isEmpty ? null : _ubicacionController.text.trim(),
-        unidadMedida: _unidadController.text.trim().isEmpty ? 'unidad' : _unidadController.text.trim(),
+        ubicacion: _ubicacionController.text.trim().isEmpty
+            ? null
+            : _ubicacionController.text.trim(),
+        unidadMedida: _unidadController.text.trim().isEmpty
+            ? 'unidad'
+            : _unidadController.text.trim(),
         costoUnitario: double.tryParse(_costoController.text.trim()),
         activo: _original?.activo ?? true,
       );
@@ -76,8 +80,9 @@ class _RepuestoFormScreenState extends ConsumerState<RepuestoFormScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo guardar el repuesto: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar el repuesto: $e')));
       }
     } finally {
       if (mounted) setState(() => _cargando = false);

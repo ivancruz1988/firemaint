@@ -128,13 +128,15 @@ List<ChecklistItem> construirItemsBomberil(String checklistId) {
   var orden = 0;
   for (final entry in plantillaBomberil.entries) {
     for (final descripcion in entry.value) {
-      items.add(ChecklistItem(
-        id: '',
-        checklistId: checklistId,
-        categoria: entry.key,
-        descripcion: descripcion,
-        orden: orden++,
-      ));
+      items.add(
+        ChecklistItem(
+          id: '',
+          checklistId: checklistId,
+          categoria: entry.key,
+          descripcion: descripcion,
+          orden: orden++,
+        ),
+      );
     }
   }
   return items;

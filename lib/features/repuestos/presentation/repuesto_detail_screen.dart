@@ -25,9 +25,13 @@ class RepuestoDetailScreen extends ConsumerWidget {
         content: const Text('Esta accion no se puede deshacer. Continuar?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Eliminar')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );
@@ -38,8 +42,9 @@ class RepuestoDetailScreen extends ConsumerWidget {
       if (context.mounted) context.pop();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
       }
     }
   }
@@ -51,7 +56,9 @@ class RepuestoDetailScreen extends ConsumerWidget {
     );
     if (resultado == null) return;
     try {
-      await ref.read(repuestoRepositoryProvider).registrarMovimiento(
+      await ref
+          .read(repuestoRepositoryProvider)
+          .registrarMovimiento(
             MovimientoStock(
               id: '',
               repuestoId: repuestoId,
@@ -66,8 +73,9 @@ class RepuestoDetailScreen extends ConsumerWidget {
       ref.invalidate(repuestosListProvider);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo registrar el movimiento: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo registrar el movimiento: $e')));
       }
     }
   }
@@ -115,10 +123,13 @@ class RepuestoDetailScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _fila('Codigo', r.codigo),
-                    _fila('Stock actual',
-                        '${formatNumber(r.stock)} ${r.unidadMedida}${r.stockBajo ? '  (BAJO)' : ''}'),
+                    _fila(
+                      'Stock actual',
+                      '${formatNumber(r.stock)} ${r.unidadMedida}${r.stockBajo ? '  (BAJO)' : ''}',
+                    ),
                     _fila('Stock minimo', formatNumber(r.stockMinimo)),
-                    if (r.ubicacion != null && r.ubicacion!.isNotEmpty) _fila('Ubicacion', r.ubicacion!),
+                    if (r.ubicacion != null && r.ubicacion!.isNotEmpty)
+                      _fila('Ubicacion', r.ubicacion!),
                     if (r.costoUnitario != null)
                       _fila('Costo unitario', '\$${formatNumber(r.costoUnitario!)}'),
                   ],
@@ -136,9 +147,7 @@ class RepuestoDetailScreen extends ConsumerWidget {
                     );
                   }
                   return Column(
-                    children: [
-                      for (final m in movimientos) _MovimientoTile(movimiento: m),
-                    ],
+                    children: [for (final m in movimientos) _MovimientoTile(movimiento: m)],
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -181,7 +190,10 @@ class _MovimientoTile extends StatelessWidget {
     };
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(backgroundColor: color.withValues(alpha: 0.15), child: Icon(icon, color: color)),
+      leading: CircleAvatar(
+        backgroundColor: color.withValues(alpha: 0.15),
+        child: Icon(icon, color: color),
+      ),
       title: Text('${movimiento.tipoMovimiento.label} · ${formatNumber(movimiento.cantidad)}'),
       subtitle: Text(
         '${formatDateTime(movimiento.fechaCreacion)}${movimiento.motivo != null ? ' · ${movimiento.motivo}' : ''}',

@@ -84,146 +84,152 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/vehiculos',
-              builder: (context, state) => const VehiculosListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'nuevo',
-                  builder: (context, state) => const VehiculoFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) =>
-                      VehiculoDetailScreen(vehiculoId: state.pathParameters['id']!),
-                ),
-                GoRoute(
-                  path: ':id/editar',
-                  builder: (context, state) =>
-                      VehiculoFormScreen(vehiculoId: state.pathParameters['id']),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/ordenes-trabajo',
-              builder: (context, state) => const OrdenesTrabajoListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'nueva',
-                  builder: (context, state) => const OrdenTrabajoFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) =>
-                      OrdenTrabajoDetailScreen(ordenId: state.pathParameters['id']!),
-                ),
-                GoRoute(
-                  path: ':id/editar',
-                  builder: (context, state) =>
-                      OrdenTrabajoFormScreen(ordenId: state.pathParameters['id']),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/checklists',
-              builder: (context, state) => const ChecklistsListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'nuevo',
-                  builder: (context, state) => const ChecklistFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) =>
-                      ChecklistDetailScreen(checklistId: state.pathParameters['id']!),
-                ),
-                GoRoute(
-                  path: ':id/editar',
-                  builder: (context, state) =>
-                      ChecklistFormScreen(checklistId: state.pathParameters['id']),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/mantenimiento-preventivo',
-              builder: (context, state) => const MantenimientoListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'nuevo',
-                  builder: (context, state) => const MantenimientoFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id/editar',
-                  builder: (context, state) =>
-                      MantenimientoFormScreen(mantenimientoId: state.pathParameters['id']),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/novedades',
-              builder: (context, state) => const NovedadesListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'nueva',
-                  builder: (context, state) => const NovedadFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) =>
-                      NovedadDetailScreen(novedadId: state.pathParameters['id']!),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/repuestos',
-              builder: (context, state) => const RepuestosListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'nuevo',
-                  builder: (context, state) => const RepuestoFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) =>
-                      RepuestoDetailScreen(repuestoId: state.pathParameters['id']!),
-                ),
-                GoRoute(
-                  path: ':id/editar',
-                  builder: (context, state) =>
-                      RepuestoFormScreen(repuestoId: state.pathParameters['id']),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/reportes', builder: (context, state) => const ReportesScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/configuracion',
-              builder: (context, state) => const ConfiguracionScreen(),
-              routes: [
-                GoRoute(
-                  path: 'usuarios',
-                  builder: (context, state) => const UsuariosAdminScreen(),
-                ),
-              ],
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/vehiculos',
+                builder: (context, state) => const VehiculosListScreen(),
+                routes: [
+                  GoRoute(path: 'nuevo', builder: (context, state) => const VehiculoFormScreen()),
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) =>
+                        VehiculoDetailScreen(vehiculoId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    builder: (context, state) =>
+                        VehiculoFormScreen(vehiculoId: state.pathParameters['id']),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/ordenes-trabajo',
+                builder: (context, state) => const OrdenesTrabajoListScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'nueva',
+                    builder: (context, state) => const OrdenTrabajoFormScreen(),
+                  ),
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) =>
+                        OrdenTrabajoDetailScreen(ordenId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    builder: (context, state) =>
+                        OrdenTrabajoFormScreen(ordenId: state.pathParameters['id']),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/checklists',
+                builder: (context, state) => const ChecklistsListScreen(),
+                routes: [
+                  GoRoute(path: 'nuevo', builder: (context, state) => const ChecklistFormScreen()),
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) =>
+                        ChecklistDetailScreen(checklistId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    builder: (context, state) =>
+                        ChecklistFormScreen(checklistId: state.pathParameters['id']),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/mantenimiento-preventivo',
+                builder: (context, state) => const MantenimientoListScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'nuevo',
+                    builder: (context, state) => const MantenimientoFormScreen(),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    builder: (context, state) =>
+                        MantenimientoFormScreen(mantenimientoId: state.pathParameters['id']),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/novedades',
+                builder: (context, state) => const NovedadesListScreen(),
+                routes: [
+                  GoRoute(path: 'nueva', builder: (context, state) => const NovedadFormScreen()),
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) =>
+                        NovedadDetailScreen(novedadId: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/repuestos',
+                builder: (context, state) => const RepuestosListScreen(),
+                routes: [
+                  GoRoute(path: 'nuevo', builder: (context, state) => const RepuestoFormScreen()),
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) =>
+                        RepuestoDetailScreen(repuestoId: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    builder: (context, state) =>
+                        RepuestoFormScreen(repuestoId: state.pathParameters['id']),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/reportes', builder: (context, state) => const ReportesScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/configuracion',
+                builder: (context, state) => const ConfiguracionScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'usuarios',
+                    builder: (context, state) => const UsuariosAdminScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     ],

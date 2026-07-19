@@ -38,7 +38,10 @@ class SupabaseNovedadRepository implements NovedadRepository {
 
   @override
   Future<List<Novedad>> getAll() async {
-    final rows = await _client.from('novedades').select().order('fecha_ocurrencia', ascending: false);
+    final rows = await _client
+        .from('novedades')
+        .select()
+        .order('fecha_ocurrencia', ascending: false);
     return rows.map(_fromMap).toList();
   }
 

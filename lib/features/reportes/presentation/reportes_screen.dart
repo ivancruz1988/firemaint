@@ -12,12 +12,12 @@ class ReportesScreen extends ConsumerWidget {
   const ReportesScreen({super.key});
 
   Color _colorEstadoOt(EstadoOt estado) => switch (estado) {
-        EstadoOt.pendiente => AppColors.alerta,
-        EstadoOt.enProceso => AppColors.info,
-        EstadoOt.esperandoRepuestos => AppColors.amarilloSeguridad,
-        EstadoOt.finalizada => AppColors.exito,
-        EstadoOt.cancelada => AppColors.textoTenue,
-      };
+    EstadoOt.pendiente => AppColors.alerta,
+    EstadoOt.enProceso => AppColors.info,
+    EstadoOt.esperandoRepuestos => AppColors.amarilloSeguridad,
+    EstadoOt.finalizada => AppColors.exito,
+    EstadoOt.cancelada => AppColors.textoTenue,
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -111,10 +111,16 @@ class ReportesScreen extends ConsumerWidget {
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(width: 14, height: 14, color: _colorEstadoOt(estado)),
+                                      Container(
+                                        width: 14,
+                                        height: 14,
+                                        color: _colorEstadoOt(estado),
+                                      ),
                                       const SizedBox(width: 6),
-                                      Text('${estado.label} (${data.otPorEstado[estado]})',
-                                          style: AppTextStyles.label),
+                                      Text(
+                                        '${estado.label} (${data.otPorEstado[estado]})',
+                                        style: AppTextStyles.label,
+                                      ),
                                     ],
                                   ),
                             ],

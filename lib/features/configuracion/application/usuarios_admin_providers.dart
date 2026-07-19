@@ -23,7 +23,6 @@ class UsuariosAdminController extends Notifier<AsyncValue<void>> {
   }
 }
 
-final usuariosAdminControllerProvider =
-    NotifierProvider<UsuariosAdminController, AsyncValue<void>>(
+final usuariosAdminControllerProvider = NotifierProvider<UsuariosAdminController, AsyncValue<void>>(
   UsuariosAdminController.new,
 );

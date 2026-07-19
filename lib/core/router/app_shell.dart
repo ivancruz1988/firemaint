@@ -6,6 +6,7 @@ import '../../domain/entities/enums.dart';
 import '../../features/auth/application/auth_providers.dart';
 import '../../features/mantenimiento_preventivo/application/mantenimiento_providers.dart';
 import '../../features/ordenes_trabajo/application/ordenes_trabajo_providers.dart';
+import '../../features/repuestos/application/repuestos_providers.dart';
 import '../theme/app_colors.dart';
 import '../utils/responsive.dart';
 import '../widgets/banner_sin_conexion.dart';
@@ -61,8 +62,10 @@ class AppShell extends ConsumerWidget {
     final puedeGestionarPreventivo = rol == UserRole.administrador || rol == UserRole.jefeTaller;
     final contadores = {
       'Ordenes': ref.watch(misOrdenesPendientesProvider).value?.length ?? 0,
-      if (puedeGestionarPreventivo)
+      if (puedeGestionarPreventivo) ...{
         'Preventivo': ref.watch(mantenimientosVencidosProvider).value?.length ?? 0,
+        'Repuestos': ref.watch(repuestosStockBajoProvider).value?.length ?? 0,
+      },
     };
 
     if (context.isDesktop) {

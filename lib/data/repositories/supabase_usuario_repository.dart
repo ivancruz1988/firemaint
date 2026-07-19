@@ -77,11 +77,10 @@ class SupabaseUsuarioRepository implements UsuarioRepository {
     // La tabla guarda rol_id, no el nombre del rol: hay que resolverlo antes.
     final rolRow = await _client.from('roles').select('id').eq('nombre', rol.toDb()).single();
 
-    await _client.from('usuarios').update({
-      'nombre_completo': nombreCompleto,
-      'rol_id': rolRow['id'],
-      'telefono': telefono,
-    }).eq('id', id);
+    await _client
+        .from('usuarios')
+        .update({'nombre_completo': nombreCompleto, 'rol_id': rolRow['id'], 'telefono': telefono})
+        .eq('id', id);
   }
 
   @override

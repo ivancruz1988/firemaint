@@ -28,10 +28,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    await ref.read(authControllerProvider.notifier).signInWithPassword(
-          _emailController.text.trim(),
-          _passwordController.text,
-        );
+    await ref
+        .read(authControllerProvider.notifier)
+        .signInWithPassword(_emailController.text.trim(), _passwordController.text);
   }
 
   @override
@@ -42,9 +41,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen(authControllerProvider, (previous, next) {
       next.whenOrNull(
         error: (error, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('No se pudo iniciar sesion: $error')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('No se pudo iniciar sesion: $error')));
         },
       );
     });
@@ -63,12 +62,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(
-                      Icons.local_fire_department,
-                      color: AppColors.amarilloSeguridad,
-                      size: 72,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      decoration: BoxDecoration(
+                        // El logo institucional es verde y dorado pensado para
+                        // fondo claro. Se lo presenta sobre una placa blanca en
+                        // lugar de recolorearlo, para no alterar los colores de
+                        // la asociacion.
+                        color: AppColors.blanco,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Image.asset(
+                        'assets/images/logo_cuartel.png',
+                        semanticLabel: 'Bomberos Voluntarios de Lomas de Zamora',
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     const Text(
                       'FireMaint',
                       textAlign: TextAlign.center,
@@ -113,9 +122,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 labelText: 'Contrasena',
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
-                                  icon: Icon(_obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined),
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
                                   onPressed: () =>
                                       setState(() => _obscurePassword = !_obscurePassword),
                                 ),

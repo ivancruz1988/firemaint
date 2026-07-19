@@ -69,9 +69,13 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
         content: const Text('Esta accion no se puede deshacer. Continuar?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Eliminar')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );
@@ -82,8 +86,9 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
       }
     }
   }
@@ -91,8 +96,9 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
   Future<void> _guardar() async {
     if (!_formKey.currentState!.validate()) return;
     if (_vehiculoId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Selecciona un vehiculo')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Selecciona un vehiculo')));
       return;
     }
     setState(() => _cargando = true);
@@ -102,8 +108,9 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
         vehiculoId: _vehiculoId!,
         checklistId: _original?.checklistId,
         nombre: _nombreController.text.trim(),
-        descripcion:
-            _descripcionController.text.trim().isEmpty ? null : _descripcionController.text.trim(),
+        descripcion: _descripcionController.text.trim().isEmpty
+            ? null
+            : _descripcionController.text.trim(),
         frecuencia: _frecuencia,
         proximaFecha: _proximaFecha,
         ultimaFechaEjecucion: _original?.ultimaFechaEjecucion,
@@ -115,8 +122,9 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo guardar el plan: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar el plan: $e')));
       }
     } finally {
       if (mounted) setState(() => _cargando = false);
@@ -157,8 +165,7 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
       appBar: AppBar(
         title: Text(_esEdicion ? 'Editar plan' : 'Nuevo plan'),
         actions: [
-          if (_esEdicion)
-            IconButton(icon: const Icon(Icons.delete_outline), onPressed: _eliminar),
+          if (_esEdicion) IconButton(icon: const Icon(Icons.delete_outline), onPressed: _eliminar),
         ],
       ),
       body: Form(
@@ -175,8 +182,10 @@ class _MantenimientoFormScreenState extends ConsumerState<MantenimientoFormScree
                   for (final v in vehiculos)
                     DropdownMenuItem(
                       value: v.id,
-                      child: Text('${v.numeroInterno} · ${v.marca} ${v.modelo}',
-                          overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        '${v.numeroInterno} · ${v.marca} ${v.modelo}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                 ],
                 onChanged: (value) => setState(() => _vehiculoId = value),

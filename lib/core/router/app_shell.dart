@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../domain/entities/enums.dart';
+import '../../features/auth/application/auth_providers.dart';
+import '../../features/mantenimiento_preventivo/application/mantenimiento_providers.dart';
 import '../../features/ordenes_trabajo/application/ordenes_trabajo_providers.dart';
 import '../theme/app_colors.dart';
 import '../utils/responsive.dart';
@@ -32,12 +35,14 @@ class AppShell extends ConsumerWidget {
 
   final StatefulNavigationShell navigationShell;
 
-  /// Envuelve el icono en un globo con la cantidad de OT abiertas asignadas al
-  /// usuario. Se muestra solo en la pestana de Ordenes y solo si hay alguna.
-  Widget _iconoConGlobo(_Tab tab, int pendientes) {
-    if (tab.label != 'Ordenes' || pendientes == 0) return Icon(tab.icon);
+  /// Envuelve el icono en un globo con la cantidad que corresponda segun la
+  /// pestana (OT asignadas en Ordenes, planes vencidos en Preventivo). Sin
+  /// contador para esa pestana, o en cero, se muestra el icono solo.
+  Widget _iconoConGlobo(_Tab tab, Map<String, int> contadores) {
+    final cantidad = contadores[tab.label] ?? 0;
+    if (cantidad == 0) return Icon(tab.icon);
     return Badge.count(
-      count: pendientes,
+      count: cantidad,
       backgroundColor: AppColors.critico,
       textColor: AppColors.blanco,
       child: Icon(tab.icon),
@@ -50,9 +55,15 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Si la consulta falla o esta cargando se muestra el menu sin globo, que
-    // es preferible a bloquear la navegacion por un contador.
-    final pendientes = ref.watch(misOrdenesPendientesProvider).value?.length ?? 0;
+    // Si alguna consulta falla o esta cargando se muestra el menu sin globo
+    // para esa pestana, que es preferible a bloquear la navegacion.
+    final rol = ref.watch(currentRoleProvider);
+    final puedeGestionarPreventivo = rol == UserRole.administrador || rol == UserRole.jefeTaller;
+    final contadores = {
+      'Ordenes': ref.watch(misOrdenesPendientesProvider).value?.length ?? 0,
+      if (puedeGestionarPreventivo)
+        'Preventivo': ref.watch(mantenimientosVencidosProvider).value?.length ?? 0,
+    };
 
     if (context.isDesktop) {
       return Scaffold(
@@ -68,13 +79,16 @@ class AppShell extends ConsumerWidget {
                     labelType: NavigationRailLabelType.all,
                     leading: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      child:
-                          Icon(Icons.local_fire_department, color: AppColors.rojoBombero, size: 32),
+                      child: Icon(
+                        Icons.local_fire_department,
+                        color: AppColors.rojoBombero,
+                        size: 32,
+                      ),
                     ),
                     destinations: [
                       for (final tab in _tabs)
                         NavigationRailDestination(
-                          icon: _iconoConGlobo(tab, pendientes),
+                          icon: _iconoConGlobo(tab, contadores),
                           label: Text(tab.label),
                         ),
                     ],
@@ -102,7 +116,7 @@ class AppShell extends ConsumerWidget {
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: [
           for (final tab in _tabs)
-            NavigationDestination(icon: _iconoConGlobo(tab, pendientes), label: tab.label),
+            NavigationDestination(icon: _iconoConGlobo(tab, contadores), label: tab.label),
         ],
       ),
     );

@@ -6,7 +6,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/widgets/fire_card.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../mantenimiento_preventivo/application/mantenimiento_providers.dart';
 import '../../ordenes_trabajo/application/ordenes_trabajo_providers.dart';
 import '../application/dashboard_providers.dart';
 
@@ -38,6 +40,7 @@ class DashboardScreen extends ConsumerWidget {
                 const Text('Estado general de la flota', style: AppTextStyles.label),
                 const SizedBox(height: 20),
                 const _AvisoTareasPendientes(),
+                const _AvisoMantenimientoVencido(),
                 kpisAsync.when(
                   data: (kpis) => LayoutBuilder(
                     builder: (context, constraints) {
@@ -215,6 +218,69 @@ class _AvisoTareasPendientes extends ConsumerWidget {
                   ),
                 ),
                 const Icon(Icons.chevron_right, color: AppColors.alerta),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Aviso de planes de mantenimiento preventivo vencidos. Solo se muestra a
+/// quien puede gestionarlos (admin/jefe de taller): un tecnico no puede
+/// crear la OT que resuelve el vencimiento, asi que mostrarselo seria una
+/// alerta sin ninguna accion posible.
+class _AvisoMantenimientoVencido extends ConsumerWidget {
+  const _AvisoMantenimientoVencido();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rol = ref.watch(currentRoleProvider);
+    final puedeGestionar = rol == UserRole.administrador || rol == UserRole.jefeTaller;
+    if (!puedeGestionar) return const SizedBox.shrink();
+
+    final vencidos = ref.watch(mantenimientosVencidosProvider).value ?? const [];
+    if (vencidos.isEmpty) return const SizedBox.shrink();
+
+    final cantidad = vencidos.length;
+    final esUno = cantidad == 1;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: AppColors.critico.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.go('/mantenimiento-preventivo'),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                const Icon(Icons.event_busy_outlined, color: AppColors.critico),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        esUno
+                            ? 'Hay 1 mantenimiento preventivo vencido'
+                            : 'Hay $cantidad mantenimientos preventivos vencidos',
+                        style: AppTextStyles.title,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        esUno ? vencidos.first.nombre : 'Toca para ver los planes vencidos',
+                        style: AppTextStyles.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppColors.critico),
               ],
             ),
           ),

@@ -21,7 +21,6 @@ class MantenimientoListScreen extends ConsumerWidget {
     final vehiculosMap = ref.watch(vehiculosMapProvider);
     final rol = ref.watch(currentRoleProvider);
     final puedeGestionar = rol == UserRole.administrador || rol == UserRole.jefeTaller;
-    final hoy = DateTime.now();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mantenimiento preventivo')),
@@ -54,7 +53,7 @@ class MantenimientoListScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final m = mantenimientos[index];
                 final vehiculo = vehiculosMap.value?[m.vehiculoId];
-                final vencido = m.proximaFecha.isBefore(hoy);
+                final vencido = estaVencido(m);
                 return FireCard(
                   onTap: () => context.push('/mantenimiento-preventivo/${m.id}/editar'),
                   child: Column(
@@ -68,13 +67,18 @@ class MantenimientoListScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       if (vehiculo != null)
-                        Text('${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}',
-                            style: AppTextStyles.label),
+                        Text(
+                          '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}',
+                          style: AppTextStyles.label,
+                        ),
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          Icon(Icons.event,
-                              size: 16, color: vencido ? AppColors.critico : AppColors.info),
+                          Icon(
+                            Icons.event,
+                            size: 16,
+                            color: vencido ? AppColors.critico : AppColors.info,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Proxima: ${formatDate(m.proximaFecha)}${vencido ? '  (VENCIDO)' : ''}',

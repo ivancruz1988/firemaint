@@ -88,7 +88,7 @@ Deno.serve(async (req: Request) => {
       .select(
         "numero_ot, titulo, descripcion, prioridad, estado, " +
           "usuarios!ordenes_trabajo_tecnico_asignado_id_fkey(nombre_completo, email, activo), " +
-          "vehiculos(patente, marca, modelo)",
+          "vehiculos(dominio, marca, modelo)",
       )
       .eq("id", orden_trabajo_id)
       .single();
@@ -112,8 +112,12 @@ Deno.serve(async (req: Request) => {
     }
 
     const veh = Array.isArray(ot.vehiculos) ? ot.vehiculos[0] : ot.vehiculos;
+    // dominio (la patente) puede no estar cargado; sin el, se muestra marca y
+    // modelo solos en lugar de un guion colgado sin nada antes.
     const unidad = escapeHtml(
-      veh ? `${veh.patente} - ${veh.marca} ${veh.modelo}` : "Sin unidad asignada",
+      veh
+        ? `${veh.dominio ? `${veh.dominio} - ` : ""}${veh.marca} ${veh.modelo}`
+        : "Sin unidad asignada",
     );
     const prioridad = PRIORIDAD_ETIQUETA[ot.prioridad as string] ?? escapeHtml(`${ot.prioridad}`);
     const titulo = escapeHtml(ot.titulo as string);

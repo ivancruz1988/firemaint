@@ -66,4 +66,11 @@ class SupabaseUsuarioRepository implements UsuarioRepository {
       throw Exception(mensaje ?? 'No se pudo crear el usuario');
     }
   }
+
+  @override
+  Future<void> setActivo(String id, {required bool activo}) async {
+    // Las reglas (solo admin, no autodesactivarse) las hace cumplir el trigger
+    // trg_proteger_campos_usuario en la base: no dependen del cliente.
+    await _client.from('usuarios').update({'activo': activo}).eq('id', id);
+  }
 }

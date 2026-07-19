@@ -60,7 +60,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final usuarioAsync = ref.read(currentUsuarioProvider);
       if (usuarioAsync.isLoading) return null;
-      final rol = usuarioAsync.value?.rol;
+
+      // Si dieron de baja al usuario con la sesion ya abierta, se lo desloguea
+      // en cuanto intenta navegar. La base de datos, ademas, ya le nego el
+      // acceso a los datos por su cuenta (migracion 0014).
+      final usuario = usuarioAsync.value;
+      if (usuario != null && !usuario.activo) {
+        ref.read(supabaseClientProvider).auth.signOut();
+        return '/login';
+      }
+
+      final rol = usuario?.rol;
 
       for (final entry in _routeRoleGuards.entries) {
         if (state.matchedLocation.startsWith(entry.key)) {

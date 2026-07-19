@@ -13,4 +13,8 @@ abstract class UsuarioRepository {
     required UserRole rol,
     String? telefono,
   });
+
+  /// Da de baja (o reactiva) un usuario. Se usa baja logica en lugar de
+  /// borrado para no perder el historial de trabajos que cargo. Solo admin.
+  Future<void> setActivo(String id, {required bool activo});
 }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/widgets/fade_slide_in.dart';
 import '../../../core/theme/widgets/fire_card.dart';
 import '../../../core/theme/widgets/status_badge.dart';
 import '../../../core/utils/formatters.dart';
@@ -85,11 +86,17 @@ class VehiculoDetailScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _SeccionIdentificacion(vehiculo: vehiculo),
+              FadeSlideIn(child: _SeccionIdentificacion(vehiculo: vehiculo)),
               const SizedBox(height: 12),
-              _SeccionUso(vehiculo: vehiculo),
+              FadeSlideIn(
+                delay: const Duration(milliseconds: 80),
+                child: _SeccionUso(vehiculo: vehiculo),
+              ),
               const SizedBox(height: 12),
-              AdjuntosSection(padre: PadreArchivo.vehiculo(vehiculo.id)),
+              FadeSlideIn(
+                delay: const Duration(milliseconds: 140),
+                child: AdjuntosSection(padre: PadreArchivo.vehiculo(vehiculo.id)),
+              ),
             ],
           );
         },

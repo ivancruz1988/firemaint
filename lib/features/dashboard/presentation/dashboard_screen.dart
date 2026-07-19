@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/widgets/fade_slide_in.dart';
 import '../../../core/theme/widgets/fire_card.dart';
+import '../../../core/theme/widgets/pulse_glow.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
@@ -31,14 +33,19 @@ class DashboardScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Text(
-                  usuarioAsync.value != null
-                      ? 'Hola, ${usuarioAsync.value!.nombreCompleto}'
-                      : 'Hola',
-                  style: AppTextStyles.headline,
+                FadeSlideIn(
+                  child: Text(
+                    usuarioAsync.value != null
+                        ? 'Hola, ${usuarioAsync.value!.nombreCompleto}'
+                        : 'Hola',
+                    style: AppTextStyles.headline,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                const Text('Estado general de la flota', style: AppTextStyles.label),
+                const FadeSlideIn(
+                  delay: Duration(milliseconds: 40),
+                  child: Text('Estado general de la flota', style: AppTextStyles.label),
+                ),
                 const SizedBox(height: 20),
                 const _AvisoTareasPendientes(),
                 const _AvisoMantenimientoVencido(),
@@ -60,12 +67,14 @@ class DashboardScreen extends ConsumerWidget {
                             etiqueta: 'Vehiculos operativos',
                             valor: kpis.operativos,
                             color: AppColors.exito,
+                            delay: const Duration(milliseconds: 260),
                           ),
                           _KpiTile(
                             icono: Icons.report_gmailerrorred_outlined,
                             etiqueta: 'Fuera de servicio',
                             valor: kpis.fueraDeServicio,
                             color: AppColors.critico,
+                            delay: const Duration(milliseconds: 320),
                           ),
                         ],
                       );
@@ -81,27 +90,30 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                FireCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.bar_chart_outlined,
-                            color: AppColors.textoPrincipal.withValues(alpha: 0.4),
-                          ),
-                          const SizedBox(width: 8),
-                          Text('Reportes y graficos', style: AppTextStyles.title),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Costos por unidad, fallas por vehiculo, cumplimiento preventivo. '
-                        'Proximamente en el modulo de Reportes.',
-                        style: AppTextStyles.body,
-                      ),
-                    ],
+                FadeSlideIn(
+                  delay: const Duration(milliseconds: 380),
+                  child: FireCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.bar_chart_outlined,
+                              color: AppColors.textoPrincipal.withValues(alpha: 0.4),
+                            ),
+                            const SizedBox(width: 8),
+                            Text('Reportes y graficos', style: AppTextStyles.title),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Costos por unidad, fallas por vehiculo, cumplimiento preventivo. '
+                          'Proximamente en el modulo de Reportes.',
+                          style: AppTextStyles.body,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -119,24 +131,36 @@ class _KpiTile extends StatelessWidget {
     required this.etiqueta,
     required this.valor,
     required this.color,
+    this.delay = Duration.zero,
   });
 
   final IconData icono;
   final String etiqueta;
   final int valor;
   final Color color;
+  final Duration delay;
 
   @override
   Widget build(BuildContext context) {
-    return FireCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icono, color: color),
-          const Spacer(),
-          Text('$valor', style: AppTextStyles.kpiNumber.copyWith(color: color)),
-          Text(etiqueta, style: AppTextStyles.label, maxLines: 2),
-        ],
+    return FadeSlideIn(
+      delay: delay,
+      child: FireCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icono, color: color),
+            const Spacer(),
+            // Conteo animado: refuerza que el numero es en vivo, no un rotulo estatico.
+            TweenAnimationBuilder<int>(
+              tween: IntTween(begin: 0, end: valor),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, _) =>
+                  Text('$value', style: AppTextStyles.kpiNumber.copyWith(color: color)),
+            ),
+            Text(etiqueta, style: AppTextStyles.label, maxLines: 2),
+          ],
+        ),
       ),
     );
   }
@@ -185,42 +209,45 @@ class _AvisoTareasPendientes extends ConsumerWidget {
     final cantidad = pendientes.length;
     final esUna = cantidad == 1;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Material(
-        color: AppColors.alerta.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 100),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Material(
+          color: AppColors.alerta.withValues(alpha: 0.14),
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.go('/ordenes-trabajo'),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                const Icon(Icons.assignment_late_outlined, color: AppColors.alerta),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        esUna ? 'Tenes 1 tarea pendiente' : 'Tenes $cantidad tareas pendientes',
-                        style: AppTextStyles.title,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        esUna
-                            ? pendientes.first.titulo
-                            : 'Toca para ver las ordenes asignadas a vos',
-                        style: AppTextStyles.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => context.go('/ordenes-trabajo'),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.assignment_late_outlined, color: AppColors.alerta),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          esUna ? 'Tenes 1 tarea pendiente' : 'Tenes $cantidad tareas pendientes',
+                          style: AppTextStyles.title,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          esUna
+                              ? pendientes.first.titulo
+                              : 'Toca para ver las ordenes asignadas a vos',
+                          style: AppTextStyles.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(Icons.chevron_right, color: AppColors.alerta),
-              ],
+                  const Icon(Icons.chevron_right, color: AppColors.alerta),
+                ],
+              ),
             ),
           ),
         ),
@@ -248,42 +275,51 @@ class _AvisoMantenimientoVencido extends ConsumerWidget {
     final cantidad = vencidos.length;
     final esUno = cantidad == 1;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Material(
-        color: AppColors.critico.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 160),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        // Alerta critica real (una unidad puede quedar fuera de norma): lleva
+        // pulso de urgencia, a diferencia de los otros dos avisos.
+        child: PulseGlow(
+          color: AppColors.critico,
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.go('/mantenimiento-preventivo'),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                const Icon(Icons.event_busy_outlined, color: AppColors.critico),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        esUno
-                            ? 'Hay 1 mantenimiento preventivo vencido'
-                            : 'Hay $cantidad mantenimientos preventivos vencidos',
-                        style: AppTextStyles.title,
+          child: Material(
+            color: AppColors.critico.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => context.go('/mantenimiento-preventivo'),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.event_busy_outlined, color: AppColors.critico),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            esUno
+                                ? 'Hay 1 mantenimiento preventivo vencido'
+                                : 'Hay $cantidad mantenimientos preventivos vencidos',
+                            style: AppTextStyles.title,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            esUno ? vencidos.first.nombre : 'Toca para ver los planes vencidos',
+                            style: AppTextStyles.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        esUno ? vencidos.first.nombre : 'Toca para ver los planes vencidos',
-                        style: AppTextStyles.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.chevron_right, color: AppColors.critico),
+                  ],
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.critico),
-              ],
+              ),
             ),
           ),
         ),
@@ -310,44 +346,47 @@ class _AvisoStockBajo extends ConsumerWidget {
     final cantidad = bajos.length;
     final esUno = cantidad == 1;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Material(
-        color: AppColors.alerta.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 220),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Material(
+          color: AppColors.alerta.withValues(alpha: 0.14),
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.go('/repuestos'),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                const Icon(Icons.inventory_2_outlined, color: AppColors.alerta),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        esUno
-                            ? 'Hay 1 repuesto con stock bajo'
-                            : 'Hay $cantidad repuestos con stock bajo',
-                        style: AppTextStyles.title,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        esUno
-                            ? '${bajos.first.codigo} - ${bajos.first.descripcion}'
-                            : 'Toca para ver el deposito',
-                        style: AppTextStyles.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => context.go('/repuestos'),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.inventory_2_outlined, color: AppColors.alerta),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          esUno
+                              ? 'Hay 1 repuesto con stock bajo'
+                              : 'Hay $cantidad repuestos con stock bajo',
+                          style: AppTextStyles.title,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          esUno
+                              ? '${bajos.first.codigo} - ${bajos.first.descripcion}'
+                              : 'Toca para ver el deposito',
+                          style: AppTextStyles.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(Icons.chevron_right, color: AppColors.alerta),
-              ],
+                  const Icon(Icons.chevron_right, color: AppColors.alerta),
+                ],
+              ),
             ),
           ),
         ),

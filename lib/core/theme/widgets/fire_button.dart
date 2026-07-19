@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_colors.dart';
+import 'press_scale.dart';
 
 enum _FireButtonVariant { primary, secondary, danger }
 
@@ -58,7 +59,9 @@ class FireButton extends StatelessWidget {
           ),
         );
     }
-    return expand ? SizedBox(width: double.infinity, child: button) : button;
+    // Feedback tactil adicional al de Material: leve reduccion de escala.
+    final wrapped = onPressed == null ? button : PressScale(child: button);
+    return expand ? SizedBox(width: double.infinity, child: wrapped) : wrapped;
   }
 
   Widget _filled(Color background, Color foreground) {

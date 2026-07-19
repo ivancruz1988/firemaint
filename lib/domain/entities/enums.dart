@@ -115,6 +115,9 @@ enum EstadoOt {
         EstadoOt.cancelada => 'cancelada',
       };
 
+  /// La OT sigue requiriendo trabajo del tecnico asignado.
+  bool get estaAbierta => this != EstadoOt.finalizada && this != EstadoOt.cancelada;
+
   String get label => switch (this) {
         EstadoOt.pendiente => 'Pendiente',
         EstadoOt.enProceso => 'En proceso',

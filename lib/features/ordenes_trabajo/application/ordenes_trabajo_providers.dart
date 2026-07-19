@@ -21,3 +21,15 @@ final ordenesTrabajoListProvider = FutureProvider<List<OrdenTrabajo>>((ref) asyn
 final ordenTrabajoByIdProvider = FutureProvider.family<OrdenTrabajo?, String>((ref, id) {
   return ref.watch(ordenTrabajoRepositoryProvider).getById(id);
 });
+
+/// Ordenes asignadas al usuario logueado que siguen abiertas.
+///
+/// Alimenta el aviso del Dashboard y el globo del menu de Ordenes. Aplica a
+/// cualquier rol: a un jefe de taller tambien pueden asignarle trabajo.
+final misOrdenesPendientesProvider = FutureProvider<List<OrdenTrabajo>>((ref) async {
+  final authUser = ref.watch(currentAuthUserProvider);
+  if (authUser == null) return const [];
+
+  final asignadas = await ref.watch(ordenTrabajoRepositoryProvider).getAsignadasA(authUser.id);
+  return asignadas.where((ot) => ot.estado.estaAbierta).toList();
+});

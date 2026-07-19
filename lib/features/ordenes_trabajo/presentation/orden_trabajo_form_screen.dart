@@ -65,8 +65,9 @@ class _OrdenTrabajoFormScreenState extends ConsumerState<OrdenTrabajoFormScreen>
   Future<void> _guardar() async {
     if (!_formKey.currentState!.validate()) return;
     if (_vehiculoId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Selecciona un vehiculo')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Selecciona un vehiculo')));
       return;
     }
     setState(() => _cargando = true);
@@ -76,8 +77,9 @@ class _OrdenTrabajoFormScreenState extends ConsumerState<OrdenTrabajoFormScreen>
         numeroOt: _original?.numeroOt ?? 0,
         vehiculoId: _vehiculoId!,
         titulo: _tituloController.text.trim(),
-        descripcion:
-            _descripcionController.text.trim().isEmpty ? null : _descripcionController.text.trim(),
+        descripcion: _descripcionController.text.trim().isEmpty
+            ? null
+            : _descripcionController.text.trim(),
         prioridad: _prioridad,
         estado: _estado,
         tecnicoAsignadoId: _tecnicoId,
@@ -98,8 +100,9 @@ class _OrdenTrabajoFormScreenState extends ConsumerState<OrdenTrabajoFormScreen>
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo guardar la OT: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar la OT: $e')));
       }
     } finally {
       if (mounted) setState(() => _cargando = false);
@@ -153,8 +156,10 @@ class _OrdenTrabajoFormScreenState extends ConsumerState<OrdenTrabajoFormScreen>
                   for (final v in vehiculos)
                     DropdownMenuItem(
                       value: v.id,
-                      child: Text('${v.numeroInterno} · ${v.marca} ${v.modelo}',
-                          overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        '${v.numeroInterno} · ${v.marca} ${v.modelo}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                 ],
                 onChanged: (value) => setState(() => _vehiculoId = value),

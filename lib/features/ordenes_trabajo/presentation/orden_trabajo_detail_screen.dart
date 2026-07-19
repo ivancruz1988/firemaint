@@ -18,15 +18,21 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
 
   final String ordenId;
 
-  Future<void> _cambiarEstado(BuildContext context, WidgetRef ref, OrdenTrabajo ot, EstadoOt nuevo) async {
+  Future<void> _cambiarEstado(
+    BuildContext context,
+    WidgetRef ref,
+    OrdenTrabajo ot,
+    EstadoOt nuevo,
+  ) async {
     try {
       await ref.read(ordenTrabajoRepositoryProvider).upsert(ot.copyWith(estado: nuevo));
       ref.invalidate(ordenTrabajoByIdProvider(ordenId));
       ref.invalidate(ordenesTrabajoListProvider);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
       }
     }
   }
@@ -39,9 +45,13 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
         content: const Text('Esta accion no se puede deshacer. Continuar?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Eliminar')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );
@@ -52,8 +62,9 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
       if (context.mounted) context.pop();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
       }
     }
   }
@@ -109,16 +120,22 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
                   children: [
                     _fila('Estado', null, badge: StatusBadge.estadoOt(ot.estado.toDb())),
                     const Divider(),
-                    _fila('Vehiculo',
-                        vehiculo == null ? '—' : '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}'),
+                    _fila(
+                      'Vehiculo',
+                      vehiculo == null
+                          ? '—'
+                          : '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}',
+                    ),
                     _fila('Tecnico asignado', tecnico?.nombreCompleto ?? 'Sin asignar'),
                     _fila('Prioridad', ot.prioridad.label),
                     if (ot.descripcion != null && ot.descripcion!.isNotEmpty)
                       _fila('Descripcion', ot.descripcion!),
-                    if (ot.horasTrabajo != null) _fila('Horas de trabajo', ot.horasTrabajo.toString()),
+                    if (ot.horasTrabajo != null)
+                      _fila('Horas de trabajo', ot.horasTrabajo.toString()),
                     if (ot.costoEstimado != null)
                       _fila('Costo estimado', '\$${formatNumber(ot.costoEstimado!)}'),
-                    if (ot.costoReal != null) _fila('Costo real', '\$${formatNumber(ot.costoReal!)}'),
+                    if (ot.costoReal != null)
+                      _fila('Costo real', '\$${formatNumber(ot.costoReal!)}'),
                     if (ot.fechaInicio != null) _fila('Inicio', formatDateTime(ot.fechaInicio!)),
                     if (ot.fechaFin != null) _fila('Fin', formatDateTime(ot.fechaFin!)),
                     if (ot.observaciones != null && ot.observaciones!.isNotEmpty)

@@ -9,10 +9,33 @@ import '../../../core/theme/widgets/fire_card.dart';
 import '../../../core/theme/widgets/status_badge.dart';
 import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
+import '../application/exportar_ordenes.dart';
 import '../application/ordenes_trabajo_providers.dart';
 
 class OrdenesTrabajoListScreen extends ConsumerWidget {
   const OrdenesTrabajoListScreen({super.key});
+
+  Future<void> _exportar(BuildContext context, WidgetRef ref, _Formato formato) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      // Se leen desde .future y no desde .value: si los mapas de vehiculos o
+      // usuarios todavia no cargaron, el archivo saldria con celdas vacias.
+      final ordenes = await ref.read(ordenesTrabajoListProvider.future);
+      final vehiculos = await ref.read(vehiculosMapProvider.future);
+      final usuarios = await ref.read(usuariosMapProvider.future);
+
+      switch (formato) {
+        case _Formato.excel:
+          await exportarOrdenesAExcel(ordenes: ordenes, vehiculos: vehiculos, usuarios: usuarios);
+        case _Formato.pdf:
+          await exportarOrdenesAPdf(ordenes: ordenes, vehiculos: vehiculos, usuarios: usuarios);
+      }
+
+      messenger.showSnackBar(SnackBar(content: Text('Se exportaron ${ordenes.length} ordenes')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('No se pudo exportar: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,7 +45,37 @@ class OrdenesTrabajoListScreen extends ConsumerWidget {
     final puedeCrear = rol == UserRole.administrador || rol == UserRole.jefeTaller;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ordenes de trabajo')),
+      appBar: AppBar(
+        title: const Text('Ordenes de trabajo'),
+        actions: [
+          // Exporta lo que la pantalla esta mostrando: para un tecnico, sus
+          // ordenes; para admin y jefe de taller, todas.
+          if (otAsync.value?.isNotEmpty ?? false)
+            PopupMenuButton<_Formato>(
+              tooltip: 'Exportar',
+              icon: const Icon(Icons.download_outlined),
+              onSelected: (formato) => _exportar(context, ref, formato),
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: _Formato.excel,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.table_chart_outlined),
+                    title: Text('Exportar a Excel'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _Formato.pdf,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.picture_as_pdf_outlined),
+                    title: Text('Exportar a PDF'),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
       floatingActionButton: puedeCrear
           ? FloatingActionButton.extended(
               onPressed: () => context.push('/ordenes-trabajo/nueva'),
@@ -59,8 +112,10 @@ class OrdenesTrabajoListScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Text('OT #${ot.numeroOt}',
-                              style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w800)),
+                          Text(
+                            'OT #${ot.numeroOt}',
+                            style: AppTextStyles.title.copyWith(fontWeight: FontWeight.w800),
+                          ),
                           const Spacer(),
                           StatusBadge.prioridadOt(ot.prioridad.toDb()),
                         ],
@@ -88,3 +143,5 @@ class OrdenesTrabajoListScreen extends ConsumerWidget {
     );
   }
 }
+
+enum _Formato { excel, pdf }

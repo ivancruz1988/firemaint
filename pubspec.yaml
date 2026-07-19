@@ -46,6 +46,9 @@ dependencies:
   image_picker: ^1.2.3
   cached_network_image: ^3.4.1
   fl_chart: ^1.2.0 # placeholder for Fase 2 (Reportes), sin uso todavia
+  excel: ^4.0.6
+  pdf: ^3.12.0
+  file_saver: ^0.4.0
 
   # Firebase Cloud Messaging (notificaciones push) queda para Fase 2.
   # No agregar firebase_core / firebase_messaging todavia.

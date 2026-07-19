@@ -32,6 +32,16 @@
 
   <title>FireMaint</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Evita el destello blanco mientras carga el motor de Flutter: sin esto
+       la pagina arranca en blanco y recien se oscurece al montar la app. */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #121417;
+    }
+  </style>
 </head>
 <body>
   <!--

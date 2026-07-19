@@ -45,7 +45,7 @@ class FireButton extends StatelessWidget {
       case _FireButtonVariant.primary:
         button = _filled(AppColors.rojoBombero, AppColors.blanco);
       case _FireButtonVariant.secondary:
-        button = _filled(AppColors.amarilloSeguridad, AppColors.grisOscuro);
+        button = _filled(AppColors.amarilloSeguridad, AppColors.textoPrincipal);
       case _FireButtonVariant.danger:
         button = OutlinedButton.icon(
           onPressed: onPressed,

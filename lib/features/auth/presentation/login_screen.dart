@@ -50,7 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.grisOscuro,
+      backgroundColor: AppColors.fondo,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

@@ -79,7 +79,7 @@ class MantenimientoListScreen extends ConsumerWidget {
                           Text(
                             'Proxima: ${formatDate(m.proximaFecha)}${vencido ? '  (VENCIDO)' : ''}',
                             style: TextStyle(
-                              color: vencido ? AppColors.critico : AppColors.grisOscuro,
+                              color: vencido ? AppColors.critico : AppColors.textoPrincipal,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

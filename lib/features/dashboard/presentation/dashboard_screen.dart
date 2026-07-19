@@ -76,7 +76,7 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.bar_chart_outlined, color: AppColors.grisOscuro.withValues(alpha: 0.4)),
+                      Icon(Icons.bar_chart_outlined, color: AppColors.textoPrincipal.withValues(alpha: 0.4)),
                       const SizedBox(width: 8),
                       Text('Reportes y graficos', style: AppTextStyles.title),
                     ],

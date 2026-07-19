@@ -5,18 +5,21 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData light() {
+  static ThemeData dark() {
     const colorScheme = ColorScheme(
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
+      // El rojo institucional se mantiene como color de marca en AppBar y FAB,
+      // donde va sobre blanco. Para acentos sobre superficies oscuras (foco de
+      // inputs, item de navegacion activo) se usa rojoClaro, que si contrasta.
       primary: AppColors.rojoBombero,
       onPrimary: AppColors.blanco,
       secondary: AppColors.amarilloSeguridad,
-      onSecondary: AppColors.grisOscuro,
+      onSecondary: AppColors.fondo,
       error: AppColors.critico,
-      onError: AppColors.blanco,
+      onError: AppColors.fondo,
       surface: AppColors.superficie,
-      onSurface: AppColors.grisOscuro,
-      surfaceContainerHighest: AppColors.grisClaro,
+      onSurface: AppColors.textoPrincipal,
+      surfaceContainerHighest: AppColors.relleno,
       onSurfaceVariant: AppColors.textoTenue,
       outline: AppColors.borde,
       outlineVariant: AppColors.borde,
@@ -62,13 +65,15 @@ class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.rojoBombero),
+        style: TextButton.styleFrom(foregroundColor: AppColors.rojoClaro),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.superficie,
+        // Relleno, no superficie: los campos van dentro de tarjetas y con el
+        // mismo tono se perderia el limite entre uno y otro.
+        fillColor: AppColors.relleno,
         labelStyle: const TextStyle(color: AppColors.textoTenue, fontWeight: FontWeight.w500),
-        floatingLabelStyle: const TextStyle(color: AppColors.rojoBombero, fontWeight: FontWeight.w700),
+        floatingLabelStyle: const TextStyle(color: AppColors.rojoClaro, fontWeight: FontWeight.w700),
         prefixIconColor: AppColors.textoTenue,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -80,7 +85,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.rojoBombero, width: 1.8),
+          borderSide: const BorderSide(color: AppColors.rojoClaro, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -92,7 +97,9 @@ class AppTheme {
         color: AppColors.superficie,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shadowColor: Colors.black.withValues(alpha: 0.06),
+        // En oscuro la sombra casi no se percibe: la separacion entre tarjeta
+        // y fondo la da el borde, no la elevacion.
+        shadowColor: Colors.black.withValues(alpha: 0.4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppColors.borde),
@@ -100,11 +107,11 @@ class AppTheme {
         margin: EdgeInsets.zero,
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.grisClaro,
-        selectedColor: AppColors.rojoBombero.withValues(alpha: 0.12),
+        backgroundColor: AppColors.relleno,
+        selectedColor: AppColors.rojoClaro.withValues(alpha: 0.22),
         side: BorderSide.none,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.grisOscuro),
-        secondaryLabelStyle: const TextStyle(color: AppColors.rojoBombero),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textoPrincipal),
+        secondaryLabelStyle: const TextStyle(color: AppColors.rojoClaro),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
@@ -121,8 +128,9 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.grisOscuro,
-        contentTextStyle: const TextStyle(color: AppColors.blanco, fontWeight: FontWeight.w500),
+        backgroundColor: AppColors.relleno,
+        contentTextStyle:
+            const TextStyle(color: AppColors.textoPrincipal, fontWeight: FontWeight.w500),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       dialogTheme: DialogThemeData(
@@ -131,7 +139,7 @@ class AppTheme {
       listTileTheme: const ListTileThemeData(iconColor: AppColors.textoTenue),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.superficie,
-        indicatorColor: AppColors.rojoBombero.withValues(alpha: 0.14),
+        indicatorColor: AppColors.rojoClaro.withValues(alpha: 0.20),
         elevation: 3,
         height: 70,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
@@ -139,21 +147,21 @@ class AppTheme {
           return TextStyle(
             fontSize: 12,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? AppColors.rojoBombero : AppColors.textoTenue,
+            color: selected ? AppColors.rojoClaro : AppColors.textoTenue,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return IconThemeData(color: selected ? AppColors.rojoBombero : AppColors.textoTenue);
+          return IconThemeData(color: selected ? AppColors.rojoClaro : AppColors.textoTenue);
         }),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: AppColors.superficie,
-        indicatorColor: AppColors.rojoBombero.withValues(alpha: 0.14),
-        selectedIconTheme: const IconThemeData(color: AppColors.rojoBombero),
+        indicatorColor: AppColors.rojoClaro.withValues(alpha: 0.20),
+        selectedIconTheme: const IconThemeData(color: AppColors.rojoClaro),
         unselectedIconTheme: const IconThemeData(color: AppColors.textoTenue),
         selectedLabelTextStyle:
-            const TextStyle(color: AppColors.rojoBombero, fontWeight: FontWeight.w700, fontSize: 12),
+            const TextStyle(color: AppColors.rojoClaro, fontWeight: FontWeight.w700, fontSize: 12),
         unselectedLabelTextStyle:
             const TextStyle(color: AppColors.textoTenue, fontWeight: FontWeight.w500, fontSize: 12),
       ),

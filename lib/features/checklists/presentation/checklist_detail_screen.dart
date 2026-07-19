@@ -281,7 +281,7 @@ class _ResumenBar extends StatelessWidget {
               _Contador(valor: ok, label: 'OK', color: AppColors.exito),
               _Contador(valor: noOk, label: 'NO OK', color: AppColors.critico),
               _Contador(valor: pendientes, label: 'Pendientes', color: AppColors.textoTenue),
-              _Contador(valor: total, label: 'Total', color: AppColors.grisOscuro),
+              _Contador(valor: total, label: 'Total', color: AppColors.textoPrincipal),
             ],
           ),
         ],
@@ -321,12 +321,16 @@ class _SeccionHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.grisOscuro,
+        color: AppColors.relleno,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         titulo.toUpperCase(),
-        style: const TextStyle(color: AppColors.blanco, fontWeight: FontWeight.w800, fontSize: 13),
+        style: const TextStyle(
+          color: AppColors.textoPrincipal,
+          fontWeight: FontWeight.w800,
+          fontSize: 13,
+        ),
       ),
     );
   }

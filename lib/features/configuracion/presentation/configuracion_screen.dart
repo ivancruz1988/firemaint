@@ -70,7 +70,7 @@ class ConfiguracionScreen extends ConsumerWidget {
             ),
             child: const Row(
               children: [
-                Icon(Icons.lock_outline, color: AppColors.grisOscuro),
+                Icon(Icons.lock_outline, color: AppColors.textoPrincipal),
                 SizedBox(width: 12),
                 Expanded(child: Text('Cambiar contrasena', style: AppTextStyles.title)),
                 Icon(Icons.chevron_right),
@@ -83,7 +83,7 @@ class ConfiguracionScreen extends ConsumerWidget {
               onTap: () => context.push('/configuracion/usuarios'),
               child: const Row(
                 children: [
-                  Icon(Icons.group_outlined, color: AppColors.grisOscuro),
+                  Icon(Icons.group_outlined, color: AppColors.textoPrincipal),
                   SizedBox(width: 12),
                   Expanded(child: Text('Gestion de usuarios', style: AppTextStyles.title)),
                   Icon(Icons.chevron_right),

@@ -154,7 +154,7 @@ class _Fila extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(width: 150, child: Text(etiqueta, style: AppTextStyles.label)),
-          Expanded(child: Text(valor, style: AppTextStyles.body.copyWith(color: AppColors.grisOscuro))),
+          Expanded(child: Text(valor, style: AppTextStyles.body.copyWith(color: AppColors.textoPrincipal))),
         ],
       ),
     );

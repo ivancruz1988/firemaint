@@ -80,7 +80,7 @@ class _AdjuntosSectionState extends ConsumerState<AdjuntosSection> {
         children: [
           Row(
             children: [
-              const Icon(Icons.attach_file, color: AppColors.grisOscuro),
+              const Icon(Icons.attach_file, color: AppColors.textoPrincipal),
               const SizedBox(width: 8),
               const Expanded(child: Text('Fotos, manuales y documentacion', style: AppTextStyles.title)),
             ],
@@ -172,7 +172,7 @@ class _ArchivoTile extends ConsumerWidget {
                   : Center(
                       child: Icon(
                         _esImagen ? Icons.image_outlined : Icons.insert_drive_file_outlined,
-                        color: AppColors.grisOscuro,
+                        color: AppColors.textoPrincipal,
                       ),
                     ),
             ),

@@ -3,7 +3,7 @@
     "short_name": "FireMaint",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#263238",
+    "background_color": "#121417",
     "theme_color": "#C62828",
     "description": "Gestion de mantenimiento de unidades para Cuartel de Bomberos Voluntarios.",
     "orientation": "portrait-primary",

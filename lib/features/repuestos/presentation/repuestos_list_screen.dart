@@ -72,7 +72,7 @@ class RepuestosListScreen extends ConsumerWidget {
                           Text(
                             '${formatNumber(r.stock)} ${r.unidadMedida}',
                             style: AppTextStyles.title.copyWith(
-                              color: r.stockBajo ? AppColors.critico : AppColors.grisOscuro,
+                              color: r.stockBajo ? AppColors.critico : AppColors.textoPrincipal,
                             ),
                           ),
                           if (r.stockBajo)

@@ -10,7 +10,7 @@ class AppTextStyles {
   static const headline = TextStyle(
     fontSize: 26,
     fontWeight: FontWeight.w800,
-    color: AppColors.grisOscuro,
+    color: AppColors.textoPrincipal,
     letterSpacing: -0.4,
     height: 1.2,
   );
@@ -18,7 +18,7 @@ class AppTextStyles {
   static const title = TextStyle(
     fontSize: 19,
     fontWeight: FontWeight.w700,
-    color: AppColors.grisOscuro,
+    color: AppColors.textoPrincipal,
     letterSpacing: -0.2,
     height: 1.25,
   );
@@ -26,13 +26,13 @@ class AppTextStyles {
   static const subtitle = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w700,
-    color: AppColors.grisOscuro,
+    color: AppColors.textoPrincipal,
   );
 
   static const body = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w500,
-    color: AppColors.grisOscuro,
+    color: AppColors.textoPrincipal,
     height: 1.35,
   );
 
@@ -52,7 +52,7 @@ class AppTextStyles {
   static const kpiNumber = TextStyle(
     fontSize: 40,
     fontWeight: FontWeight.w800,
-    color: AppColors.grisOscuro,
+    color: AppColors.textoPrincipal,
     letterSpacing: -1,
     height: 1,
   );

@@ -16,7 +16,7 @@ class StatusBadge extends StatelessWidget {
       case 'fuera_de_servicio':
         return StatusBadge(label: 'Fuera de servicio', color: AppColors.critico);
       default:
-        return StatusBadge(label: estado, color: Colors.grey);
+        return StatusBadge(label: estado, color: AppColors.textoTenue);
     }
   }
 
@@ -31,7 +31,7 @@ class StatusBadge extends StatelessWidget {
       case 'critica':
         return StatusBadge(label: 'Critica', color: AppColors.critico);
       default:
-        return StatusBadge(label: prioridad, color: Colors.grey);
+        return StatusBadge(label: prioridad, color: AppColors.textoTenue);
     }
   }
 
@@ -46,9 +46,9 @@ class StatusBadge extends StatelessWidget {
       case 'finalizada':
         return StatusBadge(label: 'Finalizada', color: AppColors.exito);
       case 'cancelada':
-        return const StatusBadge(label: 'Cancelada', color: Colors.grey);
+        return const StatusBadge(label: 'Cancelada', color: AppColors.textoTenue);
       default:
-        return StatusBadge(label: estado, color: Colors.grey);
+        return StatusBadge(label: estado, color: AppColors.textoTenue);
     }
   }
 

@@ -19,7 +19,7 @@ class ProximamenteScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icono, size: 72, color: AppColors.grisOscuro.withValues(alpha: 0.3)),
+            Icon(icono, size: 72, color: AppColors.textoPrincipal.withValues(alpha: 0.3)),
             const SizedBox(height: 16),
             Text(titulo, style: AppTextStyles.title),
             const SizedBox(height: 8),

@@ -16,7 +16,7 @@ class ReportesScreen extends ConsumerWidget {
         EstadoOt.enProceso => AppColors.info,
         EstadoOt.esperandoRepuestos => AppColors.amarilloSeguridad,
         EstadoOt.finalizada => AppColors.exito,
-        EstadoOt.cancelada => Colors.grey,
+        EstadoOt.cancelada => AppColors.textoTenue,
       };
 
   @override

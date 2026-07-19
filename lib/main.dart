@@ -37,7 +37,7 @@ class FireMaintApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'FireMaint',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: AppTheme.dark(),
       routerConfig: router,
     );
   }

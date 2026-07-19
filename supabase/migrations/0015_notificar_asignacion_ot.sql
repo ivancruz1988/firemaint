@@ -4,7 +4,7 @@
 -- sale igual si la asignacion se hace desde la aplicacion, desde el panel de
 -- Supabase o desde cualquier otro lado.
 
-create extension if not exists pg_net with schema extensions;
+create extension if not exists pg_net;
 
 -- Guarda la URL del proyecto y la clave de servicio para que el trigger pueda
 -- llamar a la Edge Function. Se completan con el script de mas abajo.
@@ -16,10 +16,13 @@ create table if not exists public.config_notificaciones (
 
 alter table public.config_notificaciones enable row level security;
 -- Sin policies: nadie la lee desde la app. El trigger la accede via
--- security definer, que no pasa por RLS.
+-- security definer, que no pasa por RLS. El revoke es una segunda capa por
+-- si alguna vez se crea una policy permisiva por error: esta tabla guarda
+-- la clave maestra del proyecto y no debe ser legible por ningun rol de API.
+revoke all on public.config_notificaciones from anon, authenticated;
 
 create or replace function public.notificar_asignacion_ot()
-returns trigger language plpgsql security definer set search_path = public, extensions as $$
+returns trigger language plpgsql security definer set search_path = public as $$
 declare
   cfg public.config_notificaciones%rowtype;
 begin
@@ -41,7 +44,7 @@ begin
 
   -- net.http_post es asincrono: encola el pedido y sigue. Si el mail falla,
   -- la orden de trabajo se guarda lo mismo.
-  perform extensions.net.http_post(
+  perform net.http_post(
     url     := cfg.functions_url || '/notificar-asignacion',
     headers := jsonb_build_object(
                  'Content-Type', 'application/json',

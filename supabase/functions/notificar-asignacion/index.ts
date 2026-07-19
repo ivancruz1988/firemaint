@@ -31,12 +31,35 @@ const PRIORIDAD_ETIQUETA: Record<string, string> = {
   critica: "CRITICA",
 };
 
+// El titulo y la descripcion de la OT los escribe un usuario y terminan
+// dentro del HTML del mail: sin escapar, podrian inyectar contenido
+// arbitrario en un correo que sale a nombre del cuartel.
+function escapeHtml(texto: string): string {
+  return texto
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "POST") {
     return json({ error: "Metodo no permitido" }, 405);
+  }
+
+  // A esta funcion solo la llama el trigger de la base, que se autentica con
+  // la service role key. La anon key tambien es un JWT valido, asi que el
+  // verify-JWT de la plataforma no alcanza: sin este chequeo, cualquiera con
+  // la clave publica de la app podria disparar mails a los tecnicos y
+  // averiguar sus direcciones.
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!serviceKey || authHeader !== `Bearer ${serviceKey}`) {
+    return json({ error: "No autorizado" }, 401);
   }
 
   const brevoKey = Deno.env.get("BREVO_API_KEY");
@@ -89,8 +112,13 @@ Deno.serve(async (req: Request) => {
     }
 
     const veh = Array.isArray(ot.vehiculos) ? ot.vehiculos[0] : ot.vehiculos;
-    const unidad = veh ? `${veh.patente} - ${veh.marca} ${veh.modelo}` : "Sin unidad asignada";
-    const prioridad = PRIORIDAD_ETIQUETA[ot.prioridad as string] ?? ot.prioridad;
+    const unidad = escapeHtml(
+      veh ? `${veh.patente} - ${veh.marca} ${veh.modelo}` : "Sin unidad asignada",
+    );
+    const prioridad = PRIORIDAD_ETIQUETA[ot.prioridad as string] ?? escapeHtml(`${ot.prioridad}`);
+    const titulo = escapeHtml(ot.titulo as string);
+    const descripcion = ot.descripcion ? escapeHtml(ot.descripcion as string) : "";
+    const nombreTecnico = escapeHtml(tecnico.nombre_completo);
 
     const html = `
       <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto">
@@ -98,14 +126,14 @@ Deno.serve(async (req: Request) => {
           <h2 style="margin:0;font-size:18px">Nueva orden de trabajo asignada</h2>
         </div>
         <div style="border:1px solid #E3E6EA;border-top:none;padding:20px;border-radius:0 0 8px 8px">
-          <p>Hola ${tecnico.nombre_completo},</p>
+          <p>Hola ${nombreTecnico},</p>
           <p>Se te asigno la orden de trabajo <strong>#${ot.numero_ot}</strong>.</p>
           <table style="width:100%;border-collapse:collapse;margin:16px 0">
-            <tr><td style="padding:6px 0;color:#6B7780">Tarea</td><td style="padding:6px 0"><strong>${ot.titulo}</strong></td></tr>
+            <tr><td style="padding:6px 0;color:#6B7780">Tarea</td><td style="padding:6px 0"><strong>${titulo}</strong></td></tr>
             <tr><td style="padding:6px 0;color:#6B7780">Unidad</td><td style="padding:6px 0">${unidad}</td></tr>
             <tr><td style="padding:6px 0;color:#6B7780">Prioridad</td><td style="padding:6px 0">${prioridad}</td></tr>
           </table>
-          ${ot.descripcion ? `<p style="color:#6B7780">${ot.descripcion}</p>` : ""}
+          ${descripcion ? `<p style="color:#6B7780">${descripcion}</p>` : ""}
           <p style="margin-top:24px">Ingresa al sistema para ver el detalle y registrar el avance.</p>
         </div>
       </div>`;
@@ -130,7 +158,9 @@ Deno.serve(async (req: Request) => {
       return json({ error: `Brevo rechazo el envio: ${detalle}` }, 502);
     }
 
-    return json({ mensaje: "Mail enviado", destinatario: tecnico.email }, 200);
+    // No se devuelve la direccion del tecnico: la respuesta no la necesita y
+    // seria un dato personal filtrado a quien llame.
+    return json({ mensaje: "Mail enviado" }, 200);
   } catch (e) {
     return json({ error: String(e) }, 500);
   }

@@ -6,11 +6,7 @@ import 'package:firemaint/features/auth/presentation/login_screen.dart';
 
 void main() {
   testWidgets('LoginScreen muestra el formulario de inicio de sesion', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: LoginScreen()),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: LoginScreen())));
 
     expect(find.text('Sistema de Gestion de Automotores'), findsOneWidget);
     expect(find.text('Ingresar'), findsOneWidget);

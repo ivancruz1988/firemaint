@@ -42,6 +42,20 @@ class AuthController extends Notifier<AsyncValue<void>> {
   Future<void> signOut() async {
     await ref.read(supabaseClientProvider).auth.signOut();
   }
+
+  /// Cambia la contrasena del usuario logueado (tipicamente para reemplazar la
+  /// provisoria que le asigno el administrador al darlo de alta).
+  Future<void> cambiarPassword({required String actual, required String nueva}) async {
+    final client = ref.read(supabaseClientProvider);
+    final email = client.auth.currentUser?.email;
+    if (email == null) throw Exception('No hay una sesion activa');
+
+    // Se revalida la contrasena actual antes de cambiarla: sin esto, cualquiera
+    // que encuentre el equipo con la sesion abierta podria dejar al usuario
+    // afuera de su propia cuenta.
+    await client.auth.signInWithPassword(email: email, password: actual);
+    await client.auth.updateUser(UserAttributes(password: nueva));
+  }
 }
 
 final authControllerProvider = NotifierProvider<AuthController, AsyncValue<void>>(AuthController.new);

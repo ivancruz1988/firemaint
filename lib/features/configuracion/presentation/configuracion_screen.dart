@@ -8,6 +8,7 @@ import '../../../core/theme/widgets/fire_button.dart';
 import '../../../core/theme/widgets/fire_card.dart';
 import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
+import 'cambiar_password_dialog.dart';
 
 class ConfiguracionScreen extends ConsumerWidget {
   const ConfiguracionScreen({super.key});
@@ -62,6 +63,21 @@ class ConfiguracionScreen extends ConsumerWidget {
             error: (error, _) => Text('No se pudo cargar el usuario: $error'),
           ),
           const SizedBox(height: 16),
+          FireCard(
+            onTap: () => showDialog(
+              context: context,
+              builder: (_) => const CambiarPasswordDialog(),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.lock_outline, color: AppColors.grisOscuro),
+                SizedBox(width: 12),
+                Expanded(child: Text('Cambiar contrasena', style: AppTextStyles.title)),
+                Icon(Icons.chevron_right),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
           if (usuarioAsync.value?.rol == UserRole.administrador)
             FireCard(
               onTap: () => context.push('/configuracion/usuarios'),

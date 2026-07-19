@@ -49,6 +49,8 @@ dependencies:
   excel: ^4.0.6
   pdf: ^3.12.0
   file_saver: ^0.4.0
+  connectivity_plus: ^7.3.0
+  http: ^1.6.0
 
   # Firebase Cloud Messaging (notificaciones push) queda para Fase 2.
   # No agregar firebase_core / firebase_messaging todavia.

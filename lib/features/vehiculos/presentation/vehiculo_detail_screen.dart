@@ -8,6 +8,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/widgets/fire_card.dart';
 import '../../../core/theme/widgets/status_badge.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/snackbar_error.dart';
 import '../../../domain/entities/enums.dart';
 import '../../../domain/entities/vehiculo.dart';
 import '../../auth/application/auth_providers.dart';
@@ -34,10 +35,23 @@ class VehiculoDetailScreen extends ConsumerWidget {
       ),
     );
     if (confirmar != true) return;
-    await ref.read(vehiculoRepositoryProvider).delete(vehiculoId);
-    ref.invalidate(vehiculosListProvider);
-    ref.invalidate(dashboardKpisProvider);
-    if (context.mounted) context.pop();
+    try {
+      await ref.read(vehiculoRepositoryProvider).delete(vehiculoId);
+      ref.invalidate(vehiculosListProvider);
+      ref.invalidate(dashboardKpisProvider);
+      if (context.mounted) context.pop();
+    } catch (e) {
+      // Sin este catch, un fallo de red dejaba al usuario mirando la pantalla
+      // sin ningun aviso de que el vehiculo seguia existiendo.
+      if (context.mounted) {
+        mostrarErrorConReintento(
+          context,
+          e,
+          () => _eliminar(context, ref),
+          accion: 'eliminar el vehiculo',
+        );
+      }
+    }
   }
 
   @override

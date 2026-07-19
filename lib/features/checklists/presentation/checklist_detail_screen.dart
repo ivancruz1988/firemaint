@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/widgets/empty_state.dart';
 import '../../../core/theme/widgets/fire_card.dart';
+import '../../../core/widgets/snackbar_error.dart';
 import '../../../domain/entities/checklist_item.dart';
 import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
@@ -24,62 +25,85 @@ class ChecklistDetailScreen extends ConsumerWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Cargar plantilla bomberil'),
         content: const Text(
-            'Se agregaran las 13 secciones con todos los items del checklist de camion de bomberos. Continuar?'),
+          'Se agregaran las 13 secciones con todos los items del checklist de camion de bomberos. Continuar?',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Cargar')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Cargar'),
+          ),
         ],
       ),
     );
     if (confirmar != true) return;
-    try {
-      await ref
-          .read(checklistRepositoryProvider)
-          .insertItems(construirItemsBomberil(checklistId));
+    Future<void> intentar() async {
+      await ref.read(checklistRepositoryProvider).insertItems(construirItemsBomberil(checklistId));
       ref.invalidate(checklistItemsProvider(checklistId));
+    }
+
+    try {
+      await intentar();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudo cargar la plantilla: $e')));
+        mostrarErrorConReintento(context, e, intentar, accion: 'cargar la plantilla');
       }
     }
   }
 
   Future<void> _reiniciarResultados(
-      BuildContext context, WidgetRef ref, List<ChecklistItem> items) async {
+    BuildContext context,
+    WidgetRef ref,
+    List<ChecklistItem> items,
+  ) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Reiniciar resultados'),
-        content: const Text('Se borraran los OK/NO OK y observaciones de todos los items. Continuar?'),
+        content: const Text(
+          'Se borraran los OK/NO OK y observaciones de todos los items. Continuar?',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Reiniciar')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Reiniciar'),
+          ),
         ],
       ),
     );
     if (confirmar != true) return;
-    try {
+    Future<void> intentar() async {
       final repo = ref.read(checklistRepositoryProvider);
       await Future.wait(
-        items.where((i) => i.resultado != null || i.observacion != null).map(
-              (i) => repo.upsertItem(i.copyWith(limpiarResultado: true)),
-            ),
+        items
+            .where((i) => i.resultado != null || i.observacion != null)
+            .map((i) => repo.upsertItem(i.copyWith(limpiarResultado: true))),
       );
       ref.invalidate(checklistItemsProvider(checklistId));
+    }
+
+    try {
+      await intentar();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No se pudieron reiniciar: $e')));
+        mostrarErrorConReintento(context, e, intentar, accion: 'reiniciar los resultados');
       }
     }
   }
 
-  Future<void> _marcar(WidgetRef ref, ChecklistItem item, ResultadoChecklistItem resultado) async {
+  Future<void> _marcar(
+    BuildContext context,
+    WidgetRef ref,
+    ChecklistItem item,
+    ResultadoChecklistItem resultado,
+  ) async {
     // Tocar el resultado ya seleccionado lo deselecciona (vuelve a pendiente).
     final nuevoResultado = item.resultado == resultado ? null : resultado;
     final actualizado = ChecklistItem(
@@ -92,8 +116,16 @@ class ChecklistDetailScreen extends ConsumerWidget {
       resultado: nuevoResultado,
       observacion: item.observacion,
     );
-    await ref.read(checklistRepositoryProvider).upsertItem(actualizado);
-    ref.invalidate(checklistItemsProvider(checklistId));
+    try {
+      await ref.read(checklistRepositoryProvider).upsertItem(actualizado);
+      ref.invalidate(checklistItemsProvider(checklistId));
+    } catch (e) {
+      // Sin esto, un corte de señal al tildar un item fallaba en silencio: el
+      // tecnico seguia marcando items pensando que se habian guardado.
+      if (context.mounted) {
+        mostrarErrorConReintento(context, e, () => _marcar(context, ref, item, resultado));
+      }
+    }
   }
 
   Future<void> _editarObservacion(BuildContext context, WidgetRef ref, ChecklistItem item) async {
@@ -102,19 +134,27 @@ class ChecklistDetailScreen extends ConsumerWidget {
       builder: (_) => _TextoDialog(titulo: 'Observacion', inicial: item.observacion),
     );
     if (texto == null) return;
-    await ref.read(checklistRepositoryProvider).upsertItem(
-          ChecklistItem(
-            id: item.id,
-            checklistId: item.checklistId,
-            ordenTrabajoId: item.ordenTrabajoId,
-            categoria: item.categoria,
-            descripcion: item.descripcion,
-            orden: item.orden,
-            resultado: item.resultado,
-            observacion: texto.trim().isEmpty ? null : texto.trim(),
-          ),
-        );
-    ref.invalidate(checklistItemsProvider(checklistId));
+    final actualizado = ChecklistItem(
+      id: item.id,
+      checklistId: item.checklistId,
+      ordenTrabajoId: item.ordenTrabajoId,
+      categoria: item.categoria,
+      descripcion: item.descripcion,
+      orden: item.orden,
+      resultado: item.resultado,
+      observacion: texto.trim().isEmpty ? null : texto.trim(),
+    );
+    try {
+      await ref.read(checklistRepositoryProvider).upsertItem(actualizado);
+      ref.invalidate(checklistItemsProvider(checklistId));
+    } catch (e) {
+      if (context.mounted) {
+        mostrarErrorConReintento(context, e, () async {
+          await ref.read(checklistRepositoryProvider).upsertItem(actualizado);
+          ref.invalidate(checklistItemsProvider(checklistId));
+        });
+      }
+    }
   }
 
   Future<void> _agregarItem(BuildContext context, WidgetRef ref, int orden) async {
@@ -123,15 +163,41 @@ class ChecklistDetailScreen extends ConsumerWidget {
       builder: (_) => const _TextoDialog(titulo: 'Nuevo item'),
     );
     if (texto == null || texto.trim().isEmpty) return;
-    await ref.read(checklistRepositoryProvider).upsertItem(
-          ChecklistItem(id: '', checklistId: checklistId, descripcion: texto.trim(), orden: orden),
-        );
-    ref.invalidate(checklistItemsProvider(checklistId));
+    final nuevoItem = ChecklistItem(
+      id: '',
+      checklistId: checklistId,
+      descripcion: texto.trim(),
+      orden: orden,
+    );
+    try {
+      await ref.read(checklistRepositoryProvider).upsertItem(nuevoItem);
+      ref.invalidate(checklistItemsProvider(checklistId));
+    } catch (e) {
+      // El reintento reenvia el mismo texto ya capturado: no hace falta que
+      // el usuario lo vuelva a escribir si fallo por falta de señal.
+      if (context.mounted) {
+        mostrarErrorConReintento(context, e, () async {
+          await ref.read(checklistRepositoryProvider).upsertItem(nuevoItem);
+          ref.invalidate(checklistItemsProvider(checklistId));
+        }, accion: 'agregar el item');
+      }
+    }
   }
 
-  Future<void> _eliminarItem(WidgetRef ref, String itemId) async {
-    await ref.read(checklistRepositoryProvider).deleteItem(itemId);
-    ref.invalidate(checklistItemsProvider(checklistId));
+  Future<void> _eliminarItem(BuildContext context, WidgetRef ref, String itemId) async {
+    try {
+      await ref.read(checklistRepositoryProvider).deleteItem(itemId);
+      ref.invalidate(checklistItemsProvider(checklistId));
+    } catch (e) {
+      if (context.mounted) {
+        mostrarErrorConReintento(
+          context,
+          e,
+          () => _eliminarItem(context, ref, itemId),
+          accion: 'eliminar el item',
+        );
+      }
+    }
   }
 
   @override
@@ -173,8 +239,14 @@ class ChecklistDetailScreen extends ConsumerWidget {
         data: (checklist) {
           if (checklist == null) return const Center(child: Text('Checklist no encontrado.'));
           return itemsAsync.when(
-            data: (items) => _buildContenido(context, ref, checklist.nombre,
-                checklist.descripcion, items, puedeGestionar),
+            data: (items) => _buildContenido(
+              context,
+              ref,
+              checklist.nombre,
+              checklist.descripcion,
+              items,
+              puedeGestionar,
+            ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('Error cargando items: $e')),
           );
@@ -185,8 +257,14 @@ class ChecklistDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContenido(BuildContext context, WidgetRef ref, String nombre, String? descripcion,
-      List<ChecklistItem> items, bool puedeGestionar) {
+  Widget _buildContenido(
+    BuildContext context,
+    WidgetRef ref,
+    String nombre,
+    String? descripcion,
+    List<ChecklistItem> items,
+    bool puedeGestionar,
+  ) {
     if (items.isEmpty) {
       return ListView(
         children: [
@@ -237,9 +315,9 @@ class ChecklistDetailScreen extends ConsumerWidget {
             _ItemTile(
               item: item,
               puedeGestionar: puedeGestionar,
-              onMarcar: (r) => _marcar(ref, item, r),
+              onMarcar: (r) => _marcar(context, ref, item, r),
               onObservacion: () => _editarObservacion(context, ref, item),
-              onEliminar: () => _eliminarItem(ref, item.id),
+              onEliminar: () => _eliminarItem(context, ref, item.id),
             ),
           const SizedBox(height: 16),
         ],
@@ -249,8 +327,12 @@ class ChecklistDetailScreen extends ConsumerWidget {
 }
 
 class _ResumenBar extends StatelessWidget {
-  const _ResumenBar(
-      {required this.ok, required this.noOk, required this.pendientes, required this.total});
+  const _ResumenBar({
+    required this.ok,
+    required this.noOk,
+    required this.pendientes,
+    required this.total,
+  });
 
   final int ok;
   final int noOk;
@@ -262,8 +344,8 @@ class _ResumenBar extends StatelessWidget {
     final (label, color) = noOk > 0
         ? ('Con observaciones', AppColors.critico)
         : pendientes > 0
-            ? ('En progreso', AppColors.alerta)
-            : ('Apto para servicio', AppColors.exito);
+        ? ('En progreso', AppColors.alerta)
+        : ('Apto para servicio', AppColors.exito);
     return FireCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,10 +402,7 @@ class _SeccionHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.relleno,
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: BoxDecoration(color: AppColors.relleno, borderRadius: BorderRadius.circular(10)),
       child: Text(
         titulo.toUpperCase(),
         style: const TextStyle(
@@ -473,8 +552,7 @@ class _TextoDialog extends StatefulWidget {
 }
 
 class _TextoDialogState extends State<_TextoDialog> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.inicial ?? '');
+  late final TextEditingController _controller = TextEditingController(text: widget.inicial ?? '');
 
   @override
   void dispose() {

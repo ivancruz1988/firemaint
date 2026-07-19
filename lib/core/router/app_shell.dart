@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/ordenes_trabajo/application/ordenes_trabajo_providers.dart';
 import '../theme/app_colors.dart';
 import '../utils/responsive.dart';
+import '../widgets/banner_sin_conexion.dart';
 
 class _Tab {
   const _Tab(this.label, this.icon);
@@ -55,33 +56,46 @@ class AppShell extends ConsumerWidget {
 
     if (context.isDesktop) {
       return Scaffold(
-        body: Row(
+        body: Column(
           children: [
-            NavigationRail(
-              selectedIndex: navigationShell.currentIndex,
-              onDestinationSelected: _onSelect,
-              labelType: NavigationRailLabelType.all,
-              leading: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Icon(Icons.local_fire_department, color: AppColors.rojoBombero, size: 32),
-              ),
-              destinations: [
-                for (final tab in _tabs)
-                  NavigationRailDestination(
-                    icon: _iconoConGlobo(tab, pendientes),
-                    label: Text(tab.label),
+            const BannerSinConexion(),
+            Expanded(
+              child: Row(
+                children: [
+                  NavigationRail(
+                    selectedIndex: navigationShell.currentIndex,
+                    onDestinationSelected: _onSelect,
+                    labelType: NavigationRailLabelType.all,
+                    leading: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child:
+                          Icon(Icons.local_fire_department, color: AppColors.rojoBombero, size: 32),
+                    ),
+                    destinations: [
+                      for (final tab in _tabs)
+                        NavigationRailDestination(
+                          icon: _iconoConGlobo(tab, pendientes),
+                          label: Text(tab.label),
+                        ),
+                    ],
                   ),
-              ],
+                  const VerticalDivider(width: 1),
+                  Expanded(child: navigationShell),
+                ],
+              ),
             ),
-            const VerticalDivider(width: 1),
-            Expanded(child: navigationShell),
           ],
         ),
       );
     }
 
     return Scaffold(
-      body: navigationShell,
+      body: Column(
+        children: [
+          const BannerSinConexion(),
+          Expanded(child: navigationShell),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: _onSelect,

@@ -40,12 +40,18 @@ class NovedadDetailScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref) async {
+  Future<void> _anular(
+    BuildContext context,
+    WidgetRef ref,
+    Novedad novedad,
+  ) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Eliminar novedad'),
-        content: const Text('Esta accion no se puede deshacer. Continuar?'),
+        title: const Text('Anular novedad'),
+        content: const Text(
+          'La novedad se conservará en el historial como anulada. Si tiene una OT abierta, también se cancelará. ¿Continuar?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -53,21 +59,23 @@ class NovedadDetailScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Eliminar'),
+            child: const Text('Anular'),
           ),
         ],
       ),
     );
     if (confirmar != true) return;
     try {
-      await ref.read(novedadRepositoryProvider).delete(novedadId);
+      await ref
+          .read(novedadRepositoryProvider)
+          .upsert(novedad.copyWith(estado: EstadoNovedad.anulada));
+      ref.invalidate(novedadByIdProvider(novedadId));
       ref.invalidate(novedadesListProvider);
-      if (context.mounted) context.pop();
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
+        ).showSnackBar(SnackBar(content: Text('No se pudo anular: $e')));
       }
     }
   }
@@ -75,6 +83,7 @@ class NovedadDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final novedadAsync = ref.watch(novedadByIdProvider(novedadId));
+    final novedad = novedadAsync.value;
     final vehiculosMap = ref.watch(vehiculosMapProvider);
     final rol = ref.watch(currentRoleProvider);
     final puedeGestionar =
@@ -86,8 +95,12 @@ class NovedadDetailScreen extends ConsumerWidget {
         actions: [
           if (puedeGestionar)
             IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () => _eliminar(context, ref),
+              tooltip: 'Anular novedad',
+              icon: const Icon(Icons.cancel_outlined),
+              onPressed:
+                  novedad == null || novedad.estado == EstadoNovedad.anulada
+                  ? null
+                  : () => _anular(context, ref, novedad),
             ),
         ],
       ),

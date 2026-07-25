@@ -5,6 +5,7 @@ import '../../data/repositories/supabase_mantenimiento_programado_repository.dar
 import '../../data/repositories/supabase_novedad_repository.dart';
 import '../../data/repositories/supabase_orden_trabajo_repository.dart';
 import '../../data/repositories/supabase_repuesto_repository.dart';
+import '../../data/repositories/supabase_proveedor_repository.dart';
 import '../../data/repositories/supabase_usuario_repository.dart';
 import '../../data/repositories/supabase_archivo_repository.dart';
 import '../../data/repositories/supabase_vehiculo_repository.dart';
@@ -13,6 +14,7 @@ import '../../domain/repositories/mantenimiento_programado_repository.dart';
 import '../../domain/repositories/novedad_repository.dart';
 import '../../domain/repositories/orden_trabajo_repository.dart';
 import '../../domain/repositories/repuesto_repository.dart';
+import '../../domain/repositories/proveedor_repository.dart';
 import '../../domain/repositories/usuario_repository.dart';
 import '../../domain/repositories/archivo_repository.dart';
 import '../../domain/repositories/vehiculo_repository.dart';
@@ -42,12 +44,17 @@ final repuestoRepositoryProvider = Provider<RepuestoRepository>((ref) {
   return SupabaseRepuestoRepository(ref.watch(supabaseClientProvider));
 });
 
+final proveedorRepositoryProvider = Provider<ProveedorRepository>((ref) {
+  return SupabaseProveedorRepository(ref.watch(supabaseClientProvider));
+});
+
 final checklistRepositoryProvider = Provider<ChecklistRepository>((ref) {
   return SupabaseChecklistRepository(ref.watch(supabaseClientProvider));
 });
 
-final mantenimientoProgramadoRepositoryProvider = Provider<MantenimientoProgramadoRepository>((
-  ref,
-) {
-  return SupabaseMantenimientoProgramadoRepository(ref.watch(supabaseClientProvider));
-});
+final mantenimientoProgramadoRepositoryProvider =
+    Provider<MantenimientoProgramadoRepository>((ref) {
+      return SupabaseMantenimientoProgramadoRepository(
+        ref.watch(supabaseClientProvider),
+      );
+    });

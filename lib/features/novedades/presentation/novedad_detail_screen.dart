@@ -26,14 +26,16 @@ class NovedadDetailScreen extends ConsumerWidget {
     EstadoNovedad nuevo,
   ) async {
     try {
-      await ref.read(novedadRepositoryProvider).upsert(n.copyWith(estado: nuevo));
+      await ref
+          .read(novedadRepositoryProvider)
+          .upsert(n.copyWith(estado: nuevo));
       ref.invalidate(novedadByIdProvider(novedadId));
       ref.invalidate(novedadesListProvider);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se pudo cambiar el estado: $e')),
+        );
       }
     }
   }
@@ -75,7 +77,8 @@ class NovedadDetailScreen extends ConsumerWidget {
     final novedadAsync = ref.watch(novedadByIdProvider(novedadId));
     final vehiculosMap = ref.watch(vehiculosMapProvider);
     final rol = ref.watch(currentRoleProvider);
-    final puedeGestionar = rol == UserRole.administrador || rol == UserRole.jefeTaller;
+    final puedeGestionar =
+        rol == UserRole.administrador || rol == UserRole.jefeTaller;
 
     return Scaffold(
       appBar: AppBar(
@@ -90,7 +93,9 @@ class NovedadDetailScreen extends ConsumerWidget {
       ),
       body: novedadAsync.when(
         data: (n) {
-          if (n == null) return const Center(child: Text('Novedad no encontrada.'));
+          if (n == null) {
+            return const Center(child: Text('Novedad no encontrada.'));
+          }
           final vehiculo = vehiculosMap.value?[n.vehiculoId];
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -115,6 +120,21 @@ class NovedadDetailScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              if (n.ordenTrabajoId != null) ...[
+                const SizedBox(height: 12),
+                FireCard(
+                  onTap: () =>
+                      context.push('/ordenes-trabajo/${n.ordenTrabajoId}'),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.assignment_outlined),
+                      SizedBox(width: 12),
+                      Expanded(child: Text('Ver orden de trabajo generada')),
+                      Icon(Icons.chevron_right),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 16),
               AdjuntosSection(padre: PadreArchivo.novedad(n.id)),
               if (puedeGestionar) ...[
@@ -128,7 +148,8 @@ class NovedadDetailScreen extends ConsumerWidget {
                       ChoiceChip(
                         label: Text(estado.label),
                         selected: n.estado == estado,
-                        onSelected: (_) => _cambiarEstado(context, ref, n, estado),
+                        onSelected: (_) =>
+                            _cambiarEstado(context, ref, n, estado),
                       ),
                   ],
                 ),
@@ -137,7 +158,8 @@ class NovedadDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('No se pudo cargar la novedad: $error')),
+        error: (error, _) =>
+            Center(child: Text('No se pudo cargar la novedad: $error')),
       ),
     );
   }

@@ -28,6 +28,7 @@ import '../../features/proveedores/presentation/proveedor_form_screen.dart';
 import '../../features/vehiculos/presentation/vehiculo_detail_screen.dart';
 import '../../features/vehiculos/presentation/vehiculo_form_screen.dart';
 import '../../features/vehiculos/presentation/vehiculos_list_screen.dart';
+import '../../features/rag/presentation/ask_database_screen.dart';
 import 'app_shell.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -269,6 +270,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/reportes',
                 builder: (context, state) => const ReportesScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/consultar-db',
+                builder: (context, state) => const AskDatabaseScreen(),
               ),
             ],
           ),

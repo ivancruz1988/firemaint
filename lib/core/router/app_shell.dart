@@ -27,6 +27,7 @@ const _tabs = [
   _Tab('Repuestos', Icons.settings_suggest_outlined),
   _Tab('Proveedores', Icons.storefront_outlined),
   _Tab('Reportes', Icons.bar_chart_outlined),
+  _Tab('Consultar DB', Icons.smart_toy_outlined),
   _Tab('Configuracion', Icons.settings_outlined),
 ];
 

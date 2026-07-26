@@ -7,13 +7,28 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+// Restricciones CORS a origenes conocidos en lugar de "*".
+function getCorsHeaders(requestOrigin: string): Record<string, string> {
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    Deno.env.get("ALLOWED_ORIGIN") || "https://firemaint.netlify.app",
+  ].filter(Boolean);
 
-function json(body: unknown, status: number): Response {
+  const origin = requestOrigin && allowedOrigins.includes(requestOrigin)
+    ? requestOrigin
+    : allowedOrigins[allowedOrigins.length - 1];
+
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
+function json(body: unknown, status: number, origin?: string): Response {
+  const corsHeaders = getCorsHeaders(origin || "");
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -30,11 +45,14 @@ function escapeHtml(texto: string): string {
 }
 
 Deno.serve(async (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "POST") {
-    return json({ error: "Metodo no permitido" }, 405);
+    return json({ error: "Metodo no permitido" }, 405, origin);
   }
 
   // Solo el trigger de la base (autenticado con la service role key) puede
@@ -42,19 +60,19 @@ Deno.serve(async (req: Request) => {
   const authHeader = req.headers.get("Authorization") ?? "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!serviceKey || authHeader !== `Bearer ${serviceKey}`) {
-    return json({ error: "No autorizado" }, 401);
+    return json({ error: "No autorizado" }, 401, origin);
   }
 
   const brevoKey = Deno.env.get("BREVO_API_KEY");
   const remitenteEmail = Deno.env.get("BREVO_REMITENTE_EMAIL");
   const remitenteNombre = Deno.env.get("BREVO_REMITENTE_NOMBRE") ?? "Bomberos Voluntarios";
   if (!brevoKey || !remitenteEmail) {
-    return json({ error: "Faltan BREVO_API_KEY o BREVO_REMITENTE_EMAIL" }, 500);
+    return json({ error: "Faltan BREVO_API_KEY o BREVO_REMITENTE_EMAIL" }, 500, origin);
   }
 
   try {
     const { repuesto_id } = await req.json();
-    if (!repuesto_id) return json({ error: "Falta repuesto_id" }, 400);
+    if (!repuesto_id) return json({ error: "Falta repuesto_id" }, 400, origin);
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey);
 
@@ -65,7 +83,7 @@ Deno.serve(async (req: Request) => {
       .single();
 
     if (errRep || !repuesto) {
-      return json({ error: `No se encontro el repuesto: ${errRep?.message}` }, 404);
+      return json({ error: `No se encontro el repuesto: ${errRep?.message}` }, 404, origin);
     }
 
     const { data: destinatarios, error: errDest } = await supabase
@@ -73,7 +91,7 @@ Deno.serve(async (req: Request) => {
       .select("email, nombre_completo, roles(nombre)")
       .eq("activo", true);
 
-    if (errDest) return json({ error: errDest.message }, 500);
+    if (errDest) return json({ error: errDest.message }, 500, origin);
 
     const gestores = (destinatarios ?? []).filter((u) => {
       const rel = u.roles as { nombre?: string } | { nombre?: string }[] | null;
@@ -82,7 +100,7 @@ Deno.serve(async (req: Request) => {
     });
 
     if (gestores.length === 0) {
-      return json({ mensaje: "No hay administradores ni jefes de taller activos" }, 200);
+      return json({ mensaje: "No hay administradores ni jefes de taller activos" }, 200, origin);
     }
 
     const descripcion = escapeHtml(repuesto.descripcion as string);
@@ -126,8 +144,8 @@ Deno.serve(async (req: Request) => {
       if (respuesta.ok) enviados++;
     }
 
-    return json({ mensaje: `Mail enviado a ${enviados} de ${gestores.length} destinatarios` }, 200);
+    return json({ mensaje: `Mail enviado a ${enviados} de ${gestores.length} destinatarios` }, 200, origin);
   } catch (e) {
-    return json({ error: String(e) }, 500);
+    return json({ error: String(e) }, 500, origin);
   }
 });

@@ -17,3 +17,31 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Headers de seguridad para todas las rutas.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Mitigacion XSS: evita que navegadores interprete como script/style si
+    # no tiene content-type explicito. Los assets de Flutter ya estan hasheados.
+    X-Content-Type-Options = "nosniff"
+
+    # Mitigacion clickjacking: nunca permitir enmarcar en un <iframe>.
+    X-Frame-Options = "DENY"
+
+    # HSTS: fuerza HTTPS en futuros accesos (un año).
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+    # Referrer-Policy: solo enviar referrer si es el mismo origen.
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # CSP: restringir a recursos de origenes conocidos. Permite:
+    # - self: scripts/styles/images de este dominio
+    # - wasm-unsafe-eval: requerido por Flutter Web (CanvasKit/Skwasm)
+    # - https://fonts.googleapis.com / https://fonts.gstatic.com: si se usan fuentes custom
+    # - https://cdn.jsdelivr.net: si se usan recursos de CDN (confirmar que no)
+    # Quitar wasm-unsafe-eval solo si migramos a un renderer sin wasm.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://supabase.co https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+    # Permissions-Policy: deshabilita caracteristicas de navegador que esta app no usa.
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"

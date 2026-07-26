@@ -1,0 +1,17 @@
+# Plantilla para firmar el build de release de Android.
+#
+# 1. Genera un keystore real (una sola vez, fuera de este repo):
+#    keytool -genkey -v -keystore ~/firemaint-release.jks \
+#      -keyalg RSA -keysize 2048 -validity 10000 -alias firemaint
+#
+# 2. Copia este archivo a android/key.properties (SIN el sufijo .example)
+#    y completa los valores reales. android/key.properties ya esta en
+#    .gitignore, nunca debe subirse al repo.
+#
+# 3. Guarda el .jks y estas contrasenas en un gestor de secretos
+#    (no en el repo, no en el chat, no en un ticket).
+
+storeFile=/ruta/absoluta/a/firemaint-release.jks
+storePassword=changeme
+keyAlias=firemaint
+keyPassword=changeme

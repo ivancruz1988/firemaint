@@ -14,14 +14,32 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 // La app corre en otro dominio que Supabase (Netlify, localhost), asi que el
 // navegador envia primero una peticion OPTIONS (preflight). Sin estas cabeceras
 // la llamada se bloquea del lado del navegador con "Failed to fetch".
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+//
+// Restringimos a origenes conocidos (dev=localhost, prod=Netlify) en lugar de
+// permitir todo el mundo con "*". Configurar ALLOWED_ORIGIN en variables de
+// entorno de Supabase si el dominio en produccion es distinto.
+const ORIGEN_PRODUCCION = Deno.env.get("ALLOWED_ORIGIN") ||
+  "https://firemaint.netlify.app";
 
-function json(body: unknown, status: number): Response {
+/// `flutter run` sirve la app en un puerto al azar de localhost, asi que en
+/// desarrollo se acepta cualquier puerto local en vez de una lista fija.
+function origenPermitido(origen: string): string {
+  if (origen === ORIGEN_PRODUCCION) return origen;
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origen)) return origen;
+  return ORIGEN_PRODUCCION;
+}
+
+function getCorsHeaders(requestOrigin: string): Record<string, string> {
+  return {
+    "Access-Control-Allow-Origin": origenPermitido(requestOrigin),
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
+function json(body: unknown, status: number, origin?: string): Response {
+  const corsHeaders = getCorsHeaders(origin || "");
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -37,18 +55,21 @@ interface CreateUserPayload {
 }
 
 Deno.serve(async (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  const corsHeaders = getCorsHeaders(origin);
+
   // Preflight del navegador: responder antes de cualquier validacion.
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   if (req.method !== "POST") {
-    return json({ error: "Metodo no permitido" }, 405);
+    return json({ error: "Metodo no permitido" }, 405, origin);
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) {
-    return json({ error: "No autenticado" }, 401);
+    return json({ error: "No autenticado" }, 401, origin);
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -63,7 +84,7 @@ Deno.serve(async (req: Request) => {
   const { data: callerData, error: callerError } = await callerClient.auth
     .getUser();
   if (callerError || !callerData?.user) {
-    return json({ error: "Token invalido" }, 401);
+    return json({ error: "Token invalido" }, 401, origin);
   }
 
   const { data: callerUsuario, error: callerUsuarioError } = await callerClient
@@ -79,7 +100,7 @@ Deno.serve(async (req: Request) => {
   const callerRol = Array.isArray(rolesRel) ? rolesRel[0]?.nombre : rolesRel?.nombre;
 
   if (callerUsuarioError || callerRol !== "administrador") {
-    return json({ error: "Solo un administrador puede crear usuarios" }, 403);
+    return json({ error: "Solo un administrador puede crear usuarios" }, 403, origin);
   }
 
   const payload = (await req.json()) as CreateUserPayload;
@@ -87,7 +108,7 @@ Deno.serve(async (req: Request) => {
     !payload.email || !payload.password || !payload.nombre_completo ||
     !payload.rol
   ) {
-    return json({ error: "Faltan campos obligatorios" }, 400);
+    return json({ error: "Faltan campos obligatorios" }, 400, origin);
   }
 
   // Cliente admin (service role) para crear el usuario en auth.users.
@@ -100,7 +121,7 @@ Deno.serve(async (req: Request) => {
     .single();
 
   if (rolError || !rolRow) {
-    return json({ error: `Rol invalido: ${payload.rol}` }, 400);
+    return json({ error: `Rol invalido: ${payload.rol}` }, 400, origin);
   }
 
   const { data: created, error: createError } = await adminClient.auth.admin
@@ -114,6 +135,7 @@ Deno.serve(async (req: Request) => {
     return json(
       { error: createError?.message ?? "No se pudo crear el usuario" },
       400,
+      origin,
     );
   }
 
@@ -129,8 +151,8 @@ Deno.serve(async (req: Request) => {
   if (insertError) {
     // Revertir: si no se pudo crear la fila de perfil, borrar el auth user.
     await adminClient.auth.admin.deleteUser(created.user.id);
-    return json({ error: insertError.message }, 400);
+    return json({ error: insertError.message }, 400, origin);
   }
 
-  return json({ id: created.user.id }, 200);
+  return json({ id: created.user.id }, 200, origin);
 });

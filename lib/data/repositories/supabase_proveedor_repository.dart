@@ -8,6 +8,14 @@ class SupabaseProveedorRepository implements ProveedorRepository {
 
   final SupabaseClient _client;
 
+  /// Envuelve un valor de patron `ilike` en comillas dobles para que las
+  /// comas, parentesis u otros caracteres reservados del DSL de filtros de
+  /// PostgREST no rompan (ni inyecten condiciones en) la lista de `.or(...)`.
+  String _patronIlike(String texto) {
+    final escapado = texto.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+    return '"%$escapado%"';
+  }
+
   Proveedor _fromMap(Map<String, dynamic> map) => Proveedor(
     id: map['id'] as String,
     nombre: map['nombre'] as String,
@@ -40,8 +48,9 @@ class SupabaseProveedorRepository implements ProveedorRepository {
     var query = _client.from('proveedores').select();
     final texto = busqueda.trim();
     if (texto.isNotEmpty) {
+      final patron = _patronIlike(texto);
       query = query.or(
-        'nombre.ilike.%$texto%,rubro.ilike.%$texto%,contacto.ilike.%$texto%,localidad.ilike.%$texto%',
+        'nombre.ilike.$patron,rubro.ilike.$patron,contacto.ilike.$patron,localidad.ilike.$patron',
       );
     }
     final rows = await query.order('nombre');

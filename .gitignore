@@ -46,3 +46,6 @@ app.*.map.json
 
 # Credenciales locales (Supabase URL / anon key)
 .env
+
+# Estado local del CLI de Supabase (que proyecto esta linkeado en esta maquina)
+supabase/.temp/

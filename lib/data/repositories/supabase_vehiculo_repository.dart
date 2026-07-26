@@ -9,6 +9,14 @@ class SupabaseVehiculoRepository implements VehiculoRepository {
 
   final SupabaseClient _client;
 
+  /// Envuelve un valor de patron `ilike` en comillas dobles para que las
+  /// comas, parentesis u otros caracteres reservados del DSL de filtros de
+  /// PostgREST no rompan (ni inyecten condiciones en) la lista de `.or(...)`.
+  String _patronIlike(String texto) {
+    final escapado = texto.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+    return '"%$escapado%"';
+  }
+
   Vehiculo _fromMap(Map<String, dynamic> map) {
     return Vehiculo(
       id: map['id'] as String,
@@ -55,9 +63,9 @@ class SupabaseVehiculoRepository implements VehiculoRepository {
       query = query.eq('estado_operativo', filtro.estado!.toDb());
     }
     if (filtro.texto != null && filtro.texto!.trim().isNotEmpty) {
-      final texto = filtro.texto!.trim();
+      final patron = _patronIlike(filtro.texto!.trim());
       query = query.or(
-        'numero_interno.ilike.%$texto%,dominio.ilike.%$texto%,marca.ilike.%$texto%,modelo.ilike.%$texto%',
+        'numero_interno.ilike.$patron,dominio.ilike.$patron,marca.ilike.$patron,modelo.ilike.$patron',
       );
     }
 

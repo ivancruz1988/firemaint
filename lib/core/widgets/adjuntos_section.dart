@@ -155,48 +155,43 @@ class _ArchivoTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder<String>(
-      future: ref.read(archivoRepositoryProvider).signedUrl(archivo.storagePath),
-      builder: (context, snapshot) {
-        final url = snapshot.data;
-        return Stack(
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: (_esImagen && url != null)
-                  ? CachedNetworkImage(
-                      imageUrl: url,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, _, _) => const Icon(Icons.broken_image_outlined),
-                    )
-                  : Center(
-                      child: Icon(
-                        _esImagen ? Icons.image_outlined : Icons.insert_drive_file_outlined,
-                        color: AppColors.textoPrincipal,
-                      ),
-                    ),
-            ),
-            Positioned(
-              top: 2,
-              right: 2,
-              child: GestureDetector(
-                onTap: onDelete,
-                child: const CircleAvatar(
-                  radius: 11,
-                  backgroundColor: AppColors.critico,
-                  child: Icon(Icons.close, size: 14, color: Colors.white),
+    final url = ref.watch(archivoSignedUrlProvider(archivo.storagePath)).value;
+    return Stack(
+      children: [
+        Container(
+          width: 88,
+          height: 88,
+          decoration: BoxDecoration(
+            color: Colors.black12,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: (_esImagen && url != null)
+              ? CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.cover,
+                  errorWidget: (_, _, _) => const Icon(Icons.broken_image_outlined),
+                )
+              : Center(
+                  child: Icon(
+                    _esImagen ? Icons.image_outlined : Icons.insert_drive_file_outlined,
+                    color: AppColors.textoPrincipal,
+                  ),
                 ),
-              ),
+        ),
+        Positioned(
+          top: 2,
+          right: 2,
+          child: GestureDetector(
+            onTap: onDelete,
+            child: const CircleAvatar(
+              radius: 11,
+              backgroundColor: AppColors.critico,
+              child: Icon(Icons.close, size: 14, color: Colors.white),
             ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 }

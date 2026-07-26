@@ -11,13 +11,28 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+// Restricciones CORS a origenes conocidos en lugar de "*".
+function getCorsHeaders(requestOrigin: string): Record<string, string> {
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    Deno.env.get("ALLOWED_ORIGIN") || "https://firemaint.netlify.app",
+  ].filter(Boolean);
 
-function json(body: unknown, status: number): Response {
+  const origin = requestOrigin && allowedOrigins.includes(requestOrigin)
+    ? requestOrigin
+    : allowedOrigins[allowedOrigins.length - 1];
+
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
+function json(body: unknown, status: number, origin?: string): Response {
+  const corsHeaders = getCorsHeaders(origin || "");
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -44,11 +59,14 @@ function escapeHtml(texto: string): string {
 }
 
 Deno.serve(async (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "POST") {
-    return json({ error: "Metodo no permitido" }, 405);
+    return json({ error: "Metodo no permitido" }, 405, origin);
   }
 
   // A esta funcion solo la llama el trigger de la base, que se autentica con
@@ -59,7 +77,7 @@ Deno.serve(async (req: Request) => {
   const authHeader = req.headers.get("Authorization") ?? "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!serviceKey || authHeader !== `Bearer ${serviceKey}`) {
-    return json({ error: "No autorizado" }, 401);
+    return json({ error: "No autorizado" }, 401, origin);
   }
 
   const brevoKey = Deno.env.get("BREVO_API_KEY");
@@ -67,13 +85,13 @@ Deno.serve(async (req: Request) => {
   const remitenteNombre = Deno.env.get("BREVO_REMITENTE_NOMBRE") ?? "Bomberos Voluntarios";
 
   if (!brevoKey || !remitenteEmail) {
-    return json({ error: "Faltan BREVO_API_KEY o BREVO_REMITENTE_EMAIL" }, 500);
+    return json({ error: "Faltan BREVO_API_KEY o BREVO_REMITENTE_EMAIL" }, 500, origin);
   }
 
   try {
     const { orden_trabajo_id } = await req.json();
     if (!orden_trabajo_id) {
-      return json({ error: "Falta orden_trabajo_id" }, 400);
+      return json({ error: "Falta orden_trabajo_id" }, 400, origin);
     }
 
     const supabase = createClient(
@@ -94,7 +112,7 @@ Deno.serve(async (req: Request) => {
       .single();
 
     if (error || !ot) {
-      return json({ error: `No se encontro la OT: ${error?.message}` }, 404);
+      return json({ error: `No se encontro la OT: ${error?.message}` }, 404, origin);
     }
 
     const rel = ot.usuarios as
@@ -104,11 +122,11 @@ Deno.serve(async (req: Request) => {
     const tecnico = Array.isArray(rel) ? rel[0] : rel;
 
     if (!tecnico?.email) {
-      return json({ mensaje: "La OT no tiene tecnico asignado, no se envia" }, 200);
+      return json({ mensaje: "La OT no tiene tecnico asignado, no se envia" }, 200, origin);
     }
     // A un usuario dado de baja no tiene sentido avisarle: ya no puede entrar.
     if (!tecnico.activo) {
-      return json({ mensaje: "El tecnico esta inactivo, no se envia" }, 200);
+      return json({ mensaje: "El tecnico esta inactivo, no se envia" }, 200, origin);
     }
 
     const veh = Array.isArray(ot.vehiculos) ? ot.vehiculos[0] : ot.vehiculos;
@@ -159,13 +177,13 @@ Deno.serve(async (req: Request) => {
 
     if (!respuesta.ok) {
       const detalle = await respuesta.text();
-      return json({ error: `Brevo rechazo el envio: ${detalle}` }, 502);
+      return json({ error: `Brevo rechazo el envio: ${detalle}` }, 502, origin);
     }
 
     // No se devuelve la direccion del tecnico: la respuesta no la necesita y
     // seria un dato personal filtrado a quien llame.
-    return json({ mensaje: "Mail enviado" }, 200);
+    return json({ mensaje: "Mail enviado" }, 200, origin);
   } catch (e) {
-    return json({ error: String(e) }, 500);
+    return json({ error: String(e) }, 500, origin);
   }
 });

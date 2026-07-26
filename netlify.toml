@@ -38,11 +38,16 @@
     # CSP: restringir a recursos de origenes conocidos. Permite:
     # - self: scripts/styles/images de este dominio
     # - wasm-unsafe-eval: requerido por Flutter Web (CanvasKit/Skwasm)
+    # - www.gstatic.com: de aca Flutter Web baja el motor CanvasKit
+    #   (canvaskit.js + canvaskit.wasm) en tiempo de ejecucion, no es un
+    #   asset que el build empaquete localmente.
     # - fonts.gstatic.com / fonts.googleapis.com: Flutter Web baja la fuente
     #   Roboto de ahi con fetch() en el arranque (via connect-src, no
     #   font-src), aunque la app no declare ninguna fuente custom propia.
-    # Quitar wasm-unsafe-eval solo si migramos a un renderer sin wasm.
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://supabase.co https://*.supabase.co https://fonts.gstatic.com https://fonts.googleapis.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    #   Es un subdominio distinto de www.gstatic.com (CanvasKit).
+    # Quitar wasm-unsafe-eval/www.gstatic.com solo si se migra a un renderer
+    # sin CanvasKit, o se sirve canvaskit desde el propio dominio.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://supabase.co https://*.supabase.co https://fonts.gstatic.com https://fonts.googleapis.com https://www.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
     # Permissions-Policy: deshabilita caracteristicas de navegador que esta app no usa.
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"

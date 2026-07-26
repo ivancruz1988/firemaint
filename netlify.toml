@@ -38,10 +38,11 @@
     # CSP: restringir a recursos de origenes conocidos. Permite:
     # - self: scripts/styles/images de este dominio
     # - wasm-unsafe-eval: requerido por Flutter Web (CanvasKit/Skwasm)
-    # - https://fonts.googleapis.com / https://fonts.gstatic.com: si se usan fuentes custom
-    # - https://cdn.jsdelivr.net: si se usan recursos de CDN (confirmar que no)
+    # - fonts.gstatic.com / fonts.googleapis.com: Flutter Web baja la fuente
+    #   Roboto de ahi con fetch() en el arranque (via connect-src, no
+    #   font-src), aunque la app no declare ninguna fuente custom propia.
     # Quitar wasm-unsafe-eval solo si migramos a un renderer sin wasm.
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://supabase.co https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://supabase.co https://*.supabase.co https://fonts.gstatic.com https://fonts.googleapis.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
     # Permissions-Policy: deshabilita caracteristicas de navegador que esta app no usa.
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"

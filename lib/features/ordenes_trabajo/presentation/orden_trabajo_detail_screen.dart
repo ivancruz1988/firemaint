@@ -23,10 +23,6 @@ class OrdenTrabajoDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<OrdenTrabajoDetailScreen> createState() => _OrdenTrabajoDetailScreenState();
 }
 
-  @override
-  ConsumerState<OrdenTrabajoDetailScreen> createState() => _OrdenTrabajoDetailScreenState();
-}
-
 class _OrdenTrabajoDetailScreenState extends ConsumerState<OrdenTrabajoDetailScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;

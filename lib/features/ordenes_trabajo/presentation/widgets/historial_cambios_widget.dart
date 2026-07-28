@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../domain/entities/historial_cambio_estado.dart';
 import '../../../../core/theme/widgets/fire_card.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../application/historial_providers.dart';
@@ -32,7 +33,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
                     children: [
                       Text(
                         'Estadísticas de Tiempo',
-                        style: AppTextStyles.headline6,
+                        style: AppTextStyles.title,
                       ),
                       const SizedBox(height: 16),
                       _buildStatRow(
@@ -56,7 +57,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             // Historial de cambios
-            Text('Historial de Cambios', style: AppTextStyles.headline6),
+            Text('Historial de Cambios', style: AppTextStyles.title),
             const SizedBox(height: 12),
             historialAsync.when(
               data: (historial) {
@@ -66,7 +67,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
                       padding: const EdgeInsets.all(16),
                       child: Text(
                         'Sin cambios registrados',
-                        style: AppTextStyles.bodyMedium.copyWith(
+                        style: AppTextStyles.body.copyWith(
                           color: Colors.grey[600],
                         ),
                       ),
@@ -94,12 +95,12 @@ class HistorialCambiosWidget extends ConsumerWidget {
                                     children: [
                                       Text(
                                         '${cambio.estadoAnterior ?? 'Inicio'} → ${cambio.estadoNuevo}',
-                                        style: AppTextStyles.bodySemibold,
+                                        style: AppTextStyles.subtitle,
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         formatDateTime(cambio.fechaCambio),
-                                        style: AppTextStyles.bodySmall.copyWith(
+                                        style: AppTextStyles.caption.copyWith(
                                           color: Colors.grey[600],
                                         ),
                                       ),
@@ -113,7 +114,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Text(
                                   'Por: ${cambio.usuarioNombre}',
-                                  style: AppTextStyles.bodySmall,
+                                  style: AppTextStyles.caption,
                                 ),
                               ),
                             if (cambio.observacion != null)
@@ -121,7 +122,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Text(
                                   cambio.observacion!,
-                                  style: AppTextStyles.bodySmall.copyWith(
+                                  style: AppTextStyles.caption.copyWith(
                                     fontStyle: FontStyle.italic,
                                   ),
                                 ),
@@ -146,10 +147,10 @@ class HistorialCambiosWidget extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppTextStyles.bodyMedium),
+        Text(label, style: AppTextStyles.body),
         Text(
           value,
-          style: AppTextStyles.bodySemibold,
+          style: AppTextStyles.subtitle,
         ),
       ],
     );

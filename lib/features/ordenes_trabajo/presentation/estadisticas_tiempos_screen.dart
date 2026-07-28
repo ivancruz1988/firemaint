@@ -38,7 +38,7 @@ class EstadisticasTiemposScreen extends ConsumerWidget {
                       children: [
                         Text(
                           '${stat.estadoDesde ?? 'Inicio'} → ${stat.estadoHacia}',
-                          style: AppTextStyles.bodySemibold,
+                          style: AppTextStyles.subtitle,
                         ),
                         const SizedBox(height: 16),
                         _buildStatRow(
@@ -82,11 +82,11 @@ class EstadisticasTiemposScreen extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodyMedium,
+          style: AppTextStyles.body,
         ),
         Text(
           value,
-          style: AppTextStyles.bodySemibold,
+          style: AppTextStyles.subtitle,
         ),
       ],
     );

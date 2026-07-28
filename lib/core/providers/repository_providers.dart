@@ -9,6 +9,7 @@ import '../../data/repositories/supabase_proveedor_repository.dart';
 import '../../data/repositories/supabase_usuario_repository.dart';
 import '../../data/repositories/supabase_archivo_repository.dart';
 import '../../data/repositories/supabase_vehiculo_repository.dart';
+import '../../data/repositories/supabase_historial_repository.dart';
 import '../../domain/repositories/checklist_repository.dart';
 import '../../domain/repositories/mantenimiento_programado_repository.dart';
 import '../../domain/repositories/novedad_repository.dart';
@@ -18,6 +19,7 @@ import '../../domain/repositories/proveedor_repository.dart';
 import '../../domain/repositories/usuario_repository.dart';
 import '../../domain/repositories/archivo_repository.dart';
 import '../../domain/repositories/vehiculo_repository.dart';
+import '../../domain/repositories/historial_repository.dart';
 import '../supabase/supabase_client_provider.dart';
 
 final usuarioRepositoryProvider = Provider<UsuarioRepository>((ref) {
@@ -58,3 +60,7 @@ final mantenimientoProgramadoRepositoryProvider =
         ref.watch(supabaseClientProvider),
       );
     });
+
+final historialRepositoryProvider = Provider<HistorialRepository>((ref) {
+  return SupabaseHistorialRepository(ref.watch(supabaseClientProvider));
+});

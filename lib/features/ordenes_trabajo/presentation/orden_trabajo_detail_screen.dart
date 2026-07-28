@@ -12,32 +12,55 @@ import '../../../domain/entities/enums.dart';
 import '../../../domain/entities/orden_trabajo.dart';
 import '../../auth/application/auth_providers.dart';
 import '../application/ordenes_trabajo_providers.dart';
+import 'widgets/historial_cambios_widget.dart';
 
-class OrdenTrabajoDetailScreen extends ConsumerWidget {
+class OrdenTrabajoDetailScreen extends ConsumerStatefulWidget {
   const OrdenTrabajoDetailScreen({super.key, required this.ordenId});
 
   final String ordenId;
 
+  @override
+  ConsumerState<OrdenTrabajoDetailScreen> createState() => _OrdenTrabajoDetailScreenState();
+}
+
+  @override
+  ConsumerState<OrdenTrabajoDetailScreen> createState() => _OrdenTrabajoDetailScreenState();
+}
+
+class _OrdenTrabajoDetailScreenState extends ConsumerState<OrdenTrabajoDetailScreen>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   Future<void> _cambiarEstado(
-    BuildContext context,
-    WidgetRef ref,
     OrdenTrabajo ot,
     EstadoOt nuevo,
   ) async {
     try {
       await ref.read(ordenTrabajoRepositoryProvider).upsert(ot.copyWith(estado: nuevo));
-      ref.invalidate(ordenTrabajoByIdProvider(ordenId));
+      ref.invalidate(ordenTrabajoByIdProvider(widget.ordenId));
       ref.invalidate(ordenesTrabajoListProvider);
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se pudo cambiar el estado: $e')),
+        );
       }
     }
   }
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref) async {
+  Future<void> _eliminar() async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -57,21 +80,21 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
     );
     if (confirmar != true) return;
     try {
-      await ref.read(ordenTrabajoRepositoryProvider).delete(ordenId);
+      await ref.read(ordenTrabajoRepositoryProvider).delete(widget.ordenId);
       ref.invalidate(ordenesTrabajoListProvider);
-      if (context.mounted) context.pop();
+      if (mounted) context.pop();
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se pudo eliminar: $e')),
+        );
       }
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final otAsync = ref.watch(ordenTrabajoByIdProvider(ordenId));
+  Widget build(BuildContext context) {
+    final otAsync = ref.watch(ordenTrabajoByIdProvider(widget.ordenId));
     final vehiculosMap = ref.watch(vehiculosMapProvider);
     final usuariosMap = ref.watch(usuariosMapProvider);
     final rol = ref.watch(currentRoleProvider);
@@ -80,15 +103,22 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalle de OT'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Detalle'),
+            Tab(text: 'Historial'),
+          ],
+        ),
         actions: [
           if (puedeEditar) ...[
             IconButton(
               icon: const Icon(Icons.edit_outlined),
-              onPressed: () => context.push('/ordenes-trabajo/$ordenId/editar'),
+              onPressed: () => context.push('/ordenes-trabajo/${widget.ordenId}/editar'),
             ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => _eliminar(context, ref),
+              onPressed: _eliminar,
             ),
           ],
         ],
@@ -101,64 +131,72 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
               ? null
               : usuariosMap.value?[ot.tecnicoAsignadoId];
 
-          return ListView(
-            padding: const EdgeInsets.all(16),
+          return TabBarView(
+            controller: _tabController,
             children: [
-              Row(
+              // Pestaña de Detalle
+              ListView(
+                padding: const EdgeInsets.all(16),
                 children: [
-                  Text('OT #${ot.numeroOt}', style: AppTextStyles.headline),
-                  const Spacer(),
-                  StatusBadge.prioridadOt(ot.prioridad.toDb()),
+                  Row(
+                    children: [
+                      Text('OT #${ot.numeroOt}', style: AppTextStyles.headline),
+                      const Spacer(),
+                      StatusBadge.prioridadOt(ot.prioridad.toDb()),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(ot.titulo, style: AppTextStyles.title),
+                  const SizedBox(height: 16),
+                  FireCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _fila('Estado', null, badge: StatusBadge.estadoOt(ot.estado.toDb())),
+                        const Divider(),
+                        _fila(
+                          'Vehiculo',
+                          vehiculo == null
+                              ? '—'
+                              : '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}',
+                        ),
+                        _fila('Tecnico asignado', tecnico?.nombreCompleto ?? 'Sin asignar'),
+                        _fila('Prioridad', ot.prioridad.label),
+                        if (ot.descripcion != null && ot.descripcion!.isNotEmpty)
+                          _fila('Descripcion', ot.descripcion!),
+                        if (ot.horasTrabajo != null)
+                          _fila('Horas de trabajo', ot.horasTrabajo.toString()),
+                        if (ot.costoEstimado != null)
+                          _fila('Costo estimado', '\$${formatNumber(ot.costoEstimado!)}'),
+                        if (ot.costoReal != null)
+                          _fila('Costo real', '\$${formatNumber(ot.costoReal!)}'),
+                        if (ot.fechaInicio != null) _fila('Inicio', formatDateTime(ot.fechaInicio!)),
+                        if (ot.fechaFin != null) _fila('Fin', formatDateTime(ot.fechaFin!)),
+                        if (ot.observaciones != null && ot.observaciones!.isNotEmpty)
+                          _fila('Observaciones', ot.observaciones!),
+                        _fila('Creada', formatDateTime(ot.fechaCreacion)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Cambiar estado', style: AppTextStyles.title),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final estado in EstadoOt.values)
+                        ChoiceChip(
+                          label: Text(estado.label),
+                          selected: ot.estado == estado,
+                          onSelected: (_) => _cambiarEstado(ot, estado),
+                        ),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(ot.titulo, style: AppTextStyles.title),
-              const SizedBox(height: 16),
-              FireCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _fila('Estado', null, badge: StatusBadge.estadoOt(ot.estado.toDb())),
-                    const Divider(),
-                    _fila(
-                      'Vehiculo',
-                      vehiculo == null
-                          ? '—'
-                          : '${vehiculo.numeroInterno} · ${vehiculo.marca} ${vehiculo.modelo}',
-                    ),
-                    _fila('Tecnico asignado', tecnico?.nombreCompleto ?? 'Sin asignar'),
-                    _fila('Prioridad', ot.prioridad.label),
-                    if (ot.descripcion != null && ot.descripcion!.isNotEmpty)
-                      _fila('Descripcion', ot.descripcion!),
-                    if (ot.horasTrabajo != null)
-                      _fila('Horas de trabajo', ot.horasTrabajo.toString()),
-                    if (ot.costoEstimado != null)
-                      _fila('Costo estimado', '\$${formatNumber(ot.costoEstimado!)}'),
-                    if (ot.costoReal != null)
-                      _fila('Costo real', '\$${formatNumber(ot.costoReal!)}'),
-                    if (ot.fechaInicio != null) _fila('Inicio', formatDateTime(ot.fechaInicio!)),
-                    if (ot.fechaFin != null) _fila('Fin', formatDateTime(ot.fechaFin!)),
-                    if (ot.observaciones != null && ot.observaciones!.isNotEmpty)
-                      _fila('Observaciones', ot.observaciones!),
-                    _fila('Creada', formatDateTime(ot.fechaCreacion)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text('Cambiar estado', style: AppTextStyles.title),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final estado in EstadoOt.values)
-                    ChoiceChip(
-                      label: Text(estado.label),
-                      selected: ot.estado == estado,
-                      onSelected: (_) => _cambiarEstado(context, ref, ot, estado),
-                    ),
-                ],
-              ),
+              // Pestaña de Historial
+              HistorialCambiosWidget(ordenId: widget.ordenId),
             ],
           );
         },

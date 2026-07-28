@@ -19,6 +19,7 @@ import '../../features/novedades/presentation/novedad_form_screen.dart';
 import '../../features/ordenes_trabajo/presentation/ordenes_trabajo_list_screen.dart';
 import '../../features/ordenes_trabajo/presentation/orden_trabajo_detail_screen.dart';
 import '../../features/ordenes_trabajo/presentation/orden_trabajo_form_screen.dart';
+import '../../features/ordenes_trabajo/presentation/estadisticas_tiempos_screen.dart';
 import '../../features/reportes/presentation/reportes_screen.dart';
 import '../../features/repuestos/presentation/repuestos_list_screen.dart';
 import '../../features/repuestos/presentation/repuesto_detail_screen.dart';
@@ -135,6 +136,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'nueva',
                     builder: (context, state) => const OrdenTrabajoFormScreen(),
+                  ),
+                  GoRoute(
+                    path: 'estadisticas',
+                    builder: (context, state) => const EstadisticasTiemposScreen(),
                   ),
                   GoRoute(
                     path: ':id',

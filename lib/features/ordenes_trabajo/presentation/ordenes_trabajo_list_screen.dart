@@ -49,6 +49,11 @@ class OrdenesTrabajoListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Ordenes de trabajo'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.analytics_outlined),
+            tooltip: 'Estadísticas de tiempos',
+            onPressed: () => context.push('/ordenes-trabajo/estadisticas'),
+          ),
           // Exporta lo que la pantalla esta mostrando: para un tecnico, sus
           // ordenes; para admin y jefe de taller, todas.
           if (otAsync.value?.isNotEmpty ?? false)

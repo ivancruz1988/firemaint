@@ -98,7 +98,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        Formatters.formatearFecha(cambio.fechaCambio),
+                                        formatDateTime(cambio.fechaCambio),
                                         style: AppTextStyles.bodySmall.copyWith(
                                           color: Colors.grey[600],
                                         ),

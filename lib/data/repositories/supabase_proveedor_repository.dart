@@ -59,11 +59,7 @@ class SupabaseProveedorRepository implements ProveedorRepository {
 
   @override
   Future<Proveedor?> getById(String id) async {
-    final row = await _client
-        .from('proveedores')
-        .select()
-        .eq('id', id)
-        .maybeSingle();
+    final row = await _client.from('proveedores').select().eq('id', id).maybeSingle();
     return row == null ? null : _fromMap(row);
   }
 
@@ -72,16 +68,10 @@ class SupabaseProveedorRepository implements ProveedorRepository {
     final data = _toMap(proveedor);
     final row = proveedor.id.isEmpty
         ? await _client.from('proveedores').insert(data).select().single()
-        : await _client
-              .from('proveedores')
-              .update(data)
-              .eq('id', proveedor.id)
-              .select()
-              .single();
+        : await _client.from('proveedores').update(data).eq('id', proveedor.id).select().single();
     return _fromMap(row);
   }
 
   @override
-  Future<void> delete(String id) =>
-      _client.from('proveedores').delete().eq('id', id);
+  Future<void> delete(String id) => _client.from('proveedores').delete().eq('id', id);
 }

@@ -35,8 +35,8 @@ class SupabaseHistorialRepository implements HistorialRepository {
   @override
   Future<List<HistorialCambioEstado>> obtenerHistorial(String ordenTrabajoId) async {
     try {
-      final rows = await _client
-          .rpc('obtener_historial_ot', params: {'p_orden_id': ordenTrabajoId}) as List;
+      final rows =
+          await _client.rpc('obtener_historial_ot', params: {'p_orden_id': ordenTrabajoId}) as List;
       return rows.map((row) => _fromMap(row as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Error al obtener historial: $e');
@@ -46,8 +46,9 @@ class SupabaseHistorialRepository implements HistorialRepository {
   @override
   Future<EstadisticasTiempos> obtenerEstadisticas(String ordenTrabajoId) async {
     try {
-      final rows = await _client
-          .rpc('calcular_tiempos_promedio', params: {'p_orden_id': ordenTrabajoId}) as List;
+      final rows =
+          await _client.rpc('calcular_tiempos_promedio', params: {'p_orden_id': ordenTrabajoId})
+              as List;
 
       if (rows.isEmpty) {
         return const EstadisticasTiempos();
@@ -63,9 +64,7 @@ class SupabaseHistorialRepository implements HistorialRepository {
   @override
   Future<List<EstadisticasTiempos>> obtenerEstadisticasGlobales() async {
     try {
-      final rows = await _client
-          .from('vw_estadisticas_tiempos_ot')
-          .select();
+      final rows = await _client.from('vw_estadisticas_tiempos_ot').select();
       return rows.map((row) => _estadisticasFromMap(row as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Error al obtener estadísticas globales: $e');

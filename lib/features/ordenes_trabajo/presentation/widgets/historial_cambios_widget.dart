@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../domain/entities/historial_cambio_estado.dart';
 import '../../../../core/theme/widgets/fire_card.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../application/historial_providers.dart';
@@ -31,15 +30,9 @@ class HistorialCambiosWidget extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Estadísticas de Tiempo',
-                        style: AppTextStyles.title,
-                      ),
+                      Text('Estadísticas de Tiempo', style: AppTextStyles.title),
                       const SizedBox(height: 16),
-                      _buildStatRow(
-                        'Tiempo promedio:',
-                        _formatearTiempo(stats),
-                      ),
+                      _buildStatRow('Tiempo promedio:', _formatearTiempo(stats.promedioDias)),
                       if (stats.cantidadTransiciones > 0)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
@@ -67,9 +60,7 @@ class HistorialCambiosWidget extends ConsumerWidget {
                       padding: const EdgeInsets.all(16),
                       child: Text(
                         'Sin cambios registrados',
-                        style: AppTextStyles.body.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                        style: AppTextStyles.body.copyWith(color: Colors.grey[600]),
                       ),
                     ),
                   );
@@ -148,29 +139,17 @@ class HistorialCambiosWidget extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: AppTextStyles.body),
-        Text(
-          value,
-          style: AppTextStyles.subtitle,
-        ),
+        Text(value, style: AppTextStyles.subtitle),
       ],
     );
   }
 
-  String _formatearTiempo(EstadisticasTiempos stats) {
-    if (stats.promedioDias == null && stats.promedioHoras == null) {
-      return 'N/A';
+  String _formatearTiempo(double? dias) {
+    if (dias == null) return 'N/A';
+    if (dias == dias.roundToDouble()) {
+      final entero = dias.toInt();
+      return entero == 1 ? '1 día' : '$entero días';
     }
-
-    final dias = stats.promedioDias?.toInt() ?? 0;
-    final horas = stats.promedioHoras?.toInt() ?? 0;
-    final minutos = ((stats.promedioHoras ?? 0) * 60).toInt() % 60;
-
-    if (dias > 0) {
-      return '$dias días, $horas horas';
-    } else if (horas > 0) {
-      return '$horas horas $minutos min';
-    } else {
-      return '$minutos minutos';
-    }
+    return '${dias.toStringAsFixed(1)} días';
   }
 }

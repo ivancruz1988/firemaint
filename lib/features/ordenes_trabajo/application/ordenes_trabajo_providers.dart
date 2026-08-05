@@ -1,22 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/repository_providers.dart';
-import '../../../domain/entities/enums.dart';
 import '../../../domain/entities/orden_trabajo.dart';
 import '../../auth/application/auth_providers.dart';
 import 'orden_trabajo_filtro.dart';
 
-/// Lista de OT segun el rol: administrador y jefe_taller ven todas; el tecnico
-/// solo ve las asignadas a el.
-final ordenesTrabajoListProvider = FutureProvider<List<OrdenTrabajo>>((ref) async {
-  final repo = ref.watch(ordenTrabajoRepositoryProvider);
-  final rol = ref.watch(currentRoleProvider);
-  final authUser = ref.watch(currentAuthUserProvider);
-
-  if (rol == UserRole.tecnico && authUser != null) {
-    return repo.getAsignadasA(authUser.id);
-  }
-  return repo.getAll();
+/// Lista completa de OT: los tres roles ven todas, incluido el tecnico. La
+/// restriccion por asignado quedo solo para el aviso personal del Dashboard
+/// (misOrdenesPendientesProvider), no para este listado general.
+final ordenesTrabajoListProvider = FutureProvider<List<OrdenTrabajo>>((ref) {
+  return ref.watch(ordenTrabajoRepositoryProvider).getAll();
 });
 
 class FiltroOrdenesController extends Notifier<OrdenTrabajoFiltro> {

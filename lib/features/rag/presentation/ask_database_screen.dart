@@ -35,12 +35,7 @@ class _AskDatabaseScreenState extends ConsumerState<AskDatabaseScreen> {
       await ref.read(chatProvider.notifier).responder(texto);
     } catch (e) {
       if (mounted) {
-        mostrarErrorConReintento(
-          context,
-          e,
-          () => _consultar(texto),
-          accion: 'hacer la consulta',
-        );
+        mostrarErrorConReintento(context, e, () => _consultar(texto), accion: 'hacer la consulta');
       }
     } finally {
       if (mounted) setState(() => _consultando = false);
@@ -84,8 +79,7 @@ class _AskDatabaseScreenState extends ConsumerState<AskDatabaseScreen> {
                         _Burbuja(mensaje: mensajes[mensajes.length - 1 - i]),
                   ),
           ),
-          if (_consultando)
-            const LinearProgressIndicator(minHeight: 2),
+          if (_consultando) const LinearProgressIndicator(minHeight: 2),
           _CampoPregunta(
             controller: _controller,
             habilitado: !_consultando,
@@ -108,11 +102,7 @@ class _SinMensajes extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.smart_toy_outlined,
-              size: 56,
-              color: AppColors.textoTenue,
-            ),
+            const Icon(Icons.smart_toy_outlined, size: 56, color: AppColors.textoTenue),
             const SizedBox(height: 16),
             const Text(
               'Preguntá sobre la flota',
@@ -144,8 +134,7 @@ class _Burbuja extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment:
-            esUsuario ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: esUsuario ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           Flexible(
             child: Container(
@@ -153,9 +142,7 @@ class _Burbuja extends StatelessWidget {
               decoration: BoxDecoration(
                 color: esUsuario ? AppColors.rojoBombero : AppColors.superficie,
                 borderRadius: BorderRadius.circular(14),
-                border: esUsuario
-                    ? null
-                    : Border.all(color: AppColors.borde),
+                border: esUsuario ? null : Border.all(color: AppColors.borde),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,9 +150,7 @@ class _Burbuja extends StatelessWidget {
                   Text(
                     mensaje.texto,
                     style: AppTextStyles.body.copyWith(
-                      color: esUsuario
-                          ? AppColors.blanco
-                          : AppColors.textoPrincipal,
+                      color: esUsuario ? AppColors.blanco : AppColors.textoPrincipal,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -219,9 +204,7 @@ class _CampoPregunta extends StatelessWidget {
               minLines: 1,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => onEnviar(),
-              decoration: const InputDecoration(
-                hintText: 'Escribi tu consulta...',
-              ),
+              decoration: const InputDecoration(hintText: 'Escribi tu consulta...'),
             ),
           ),
           const SizedBox(width: 8),

@@ -13,15 +13,11 @@ class EstadisticasTiemposScreen extends ConsumerWidget {
     final estadisticasAsync = ref.watch(estadisticasGlobalesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Estadísticas de Tiempos'),
-      ),
+      appBar: AppBar(title: const Text('Estadísticas de Tiempos')),
       body: estadisticasAsync.when(
         data: (estadisticas) {
           if (estadisticas.isEmpty) {
-            return const Center(
-              child: Text('Sin datos disponibles'),
-            );
+            return const Center(child: Text('Sin datos disponibles'));
           }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -41,25 +37,13 @@ class EstadisticasTiemposScreen extends ConsumerWidget {
                           style: AppTextStyles.subtitle,
                         ),
                         const SizedBox(height: 16),
-                        _buildStatRow(
-                          'Cantidad de transiciones:',
-                          '${stat.cantidadTransiciones}',
-                        ),
+                        _buildStatRow('Cantidad de transiciones:', '${stat.cantidadTransiciones}'),
                         const SizedBox(height: 8),
-                        _buildStatRow(
-                          'Promedio:',
-                          _formatearTiempo(stat.promedioDias, stat.promedioHoras),
-                        ),
+                        _buildStatRow('Promedio:', _formatearTiempo(stat.promedioDias)),
                         const SizedBox(height: 8),
-                        _buildStatRow(
-                          'Mínimo:',
-                          _formatearTiempo(null, stat.minimoHoras),
-                        ),
+                        _buildStatRow('Mínimo:', _formatearTiempo(stat.minimoDias)),
                         const SizedBox(height: 8),
-                        _buildStatRow(
-                          'Máximo:',
-                          _formatearTiempo(null, stat.maximoHoras),
-                        ),
+                        _buildStatRow('Máximo:', _formatearTiempo(stat.maximoDias)),
                       ],
                     ),
                   ),
@@ -69,9 +53,7 @@ class EstadisticasTiemposScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(
-          child: Text('Error: $err'),
-        ),
+        error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );
   }
@@ -80,33 +62,18 @@ class EstadisticasTiemposScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.body,
-        ),
-        Text(
-          value,
-          style: AppTextStyles.subtitle,
-        ),
+        Text(label, style: AppTextStyles.body),
+        Text(value, style: AppTextStyles.subtitle),
       ],
     );
   }
 
-  String _formatearTiempo(double? dias, double? horas) {
-    if (dias == null && horas == null) {
-      return 'N/A';
+  String _formatearTiempo(double? dias) {
+    if (dias == null) return 'N/A';
+    if (dias == dias.roundToDouble()) {
+      final entero = dias.toInt();
+      return entero == 1 ? '1 día' : '$entero días';
     }
-
-    final d = dias?.toInt() ?? 0;
-    final h = horas?.toInt() ?? 0;
-    final m = ((horas ?? 0) * 60).toInt() % 60;
-
-    if (d > 0) {
-      return '$d días, $h horas';
-    } else if (h > 0) {
-      return '$h horas $m min';
-    } else {
-      return '$m minutos';
-    }
+    return '${dias.toStringAsFixed(1)} días';
   }
 }

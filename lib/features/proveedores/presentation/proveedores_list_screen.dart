@@ -20,34 +20,23 @@ class ProveedoresListScreen extends ConsumerWidget {
       rol == UserRole.administrador || rol == UserRole.jefeTaller;
 
   Future<void> _abrir(BuildContext context, Uri uri) async {
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication) &&
-        context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se pudo abrir la aplicación de contacto.'),
-        ),
-      );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication) && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No se pudo abrir la aplicación de contacto.')));
     }
   }
 
-  String _numeroWhatsapp(String numero) =>
-      numero.replaceAll(RegExp(r'[^0-9]'), '');
+  String _numeroWhatsapp(String numero) => numero.replaceAll(RegExp(r'[^0-9]'), '');
 
-  Future<void> _confirmarBorrado(
-    BuildContext context,
-    WidgetRef ref,
-    Proveedor p,
-  ) async {
+  Future<void> _confirmarBorrado(BuildContext context, WidgetRef ref, Proveedor p) async {
     final borrar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar proveedor'),
         content: Text('¿Querés eliminar a ${p.nombre}?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.critico),
             onPressed: () => Navigator.pop(context, true),
@@ -62,9 +51,9 @@ class ProveedoresListScreen extends ConsumerWidget {
       ref.invalidate(proveedoresListProvider);
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo eliminar el proveedor.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No se pudo eliminar el proveedor.')));
       }
     }
   }
@@ -90,8 +79,7 @@ class ProveedoresListScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
             child: TextField(
-              onChanged: (valor) =>
-                  ref.read(proveedorBusquedaProvider.notifier).state = valor,
+              onChanged: (valor) => ref.read(proveedorBusquedaProvider.notifier).state = valor,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 hintText: 'Buscar por nombre, rubro, contacto o localidad',
@@ -109,8 +97,7 @@ class ProveedoresListScreen extends ConsumerWidget {
                         EmptyState(
                           icon: Icons.storefront_outlined,
                           titulo: 'Sin proveedores',
-                          mensaje:
-                              'Guardá acá los contactos de repuestos, talleres y servicios.',
+                          mensaje: 'Guardá acá los contactos de repuestos, talleres y servicios.',
                         ),
                       ],
                     );
@@ -128,8 +115,7 @@ class ProveedoresListScreen extends ConsumerWidget {
                             Row(
                               children: [
                                 CircleAvatar(
-                                  backgroundColor: AppColors.rojoBombero
-                                      .withValues(alpha: .15),
+                                  backgroundColor: AppColors.rojoBombero.withValues(alpha: .15),
                                   child: const Icon(
                                     Icons.storefront_outlined,
                                     color: AppColors.rojoBombero,
@@ -138,34 +124,24 @@ class ProveedoresListScreen extends ConsumerWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        p.nombre,
-                                        style: AppTextStyles.title,
-                                      ),
+                                      Text(p.nombre, style: AppTextStyles.title),
                                       if (p.rubro?.isNotEmpty == true)
-                                        Text(
-                                          p.rubro!,
-                                          style: AppTextStyles.label,
-                                        ),
+                                        Text(p.rubro!, style: AppTextStyles.label),
                                     ],
                                   ),
                                 ),
                                 if (puedeGestionar)
                                   IconButton(
                                     tooltip: 'Editar',
-                                    onPressed: () => context.push(
-                                      '/proveedores/${p.id}/editar',
-                                    ),
+                                    onPressed: () => context.push('/proveedores/${p.id}/editar'),
                                     icon: const Icon(Icons.edit_outlined),
                                   ),
                                 if (esAdmin)
                                   IconButton(
                                     tooltip: 'Eliminar',
-                                    onPressed: () =>
-                                        _confirmarBorrado(context, ref, p),
+                                    onPressed: () => _confirmarBorrado(context, ref, p),
                                     icon: const Icon(
                                       Icons.delete_outline,
                                       color: AppColors.critico,
@@ -177,10 +153,10 @@ class ProveedoresListScreen extends ConsumerWidget {
                                 p.localidad?.isNotEmpty == true) ...[
                               const SizedBox(height: 10),
                               Text(
-                                [p.contacto, p.localidad]
-                                    .whereType<String>()
-                                    .where((e) => e.isNotEmpty)
-                                    .join(' · '),
+                                [
+                                  p.contacto,
+                                  p.localidad,
+                                ].whereType<String>().where((e) => e.isNotEmpty).join(' · '),
                                 style: AppTextStyles.label,
                               ),
                             ],
@@ -194,36 +170,27 @@ class ProveedoresListScreen extends ConsumerWidget {
                                 children: [
                                   if (p.telefono?.isNotEmpty == true)
                                     OutlinedButton.icon(
-                                      onPressed: () => _abrir(
-                                        context,
-                                        Uri(scheme: 'tel', path: p.telefono),
-                                      ),
+                                      onPressed: () =>
+                                          _abrir(context, Uri(scheme: 'tel', path: p.telefono)),
                                       icon: const Icon(Icons.call_outlined),
                                       label: const Text('Llamar'),
                                     ),
                                   if (p.whatsapp?.isNotEmpty == true)
                                     FilledButton.icon(
                                       style: FilledButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF25D366,
-                                        ),
+                                        backgroundColor: const Color(0xFF25D366),
                                       ),
                                       onPressed: () => _abrir(
                                         context,
-                                        Uri.https(
-                                          'wa.me',
-                                          '/${_numeroWhatsapp(p.whatsapp!)}',
-                                        ),
+                                        Uri.https('wa.me', '/${_numeroWhatsapp(p.whatsapp!)}'),
                                       ),
                                       icon: const Icon(Icons.chat_outlined),
                                       label: const Text('WhatsApp'),
                                     ),
                                   if (p.email?.isNotEmpty == true)
                                     OutlinedButton.icon(
-                                      onPressed: () => _abrir(
-                                        context,
-                                        Uri(scheme: 'mailto', path: p.email),
-                                      ),
+                                      onPressed: () =>
+                                          _abrir(context, Uri(scheme: 'mailto', path: p.email)),
                                       icon: const Icon(Icons.email_outlined),
                                       label: const Text('Correo'),
                                     ),
@@ -237,9 +204,8 @@ class ProveedoresListScreen extends ConsumerWidget {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => Center(
-                  child: Text('No se pudieron cargar los proveedores: $error'),
-                ),
+                error: (error, _) =>
+                    Center(child: Text('No se pudieron cargar los proveedores: $error')),
               ),
             ),
           ),

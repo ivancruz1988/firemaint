@@ -12,9 +12,6 @@ final proveedoresListProvider = FutureProvider<List<Proveedor>>((ref) {
       .getAll(busqueda: ref.watch(proveedorBusquedaProvider));
 });
 
-final proveedorByIdProvider = FutureProvider.family<Proveedor?, String>((
-  ref,
-  id,
-) {
+final proveedorByIdProvider = FutureProvider.family<Proveedor?, String>((ref, id) {
   return ref.watch(proveedorRepositoryProvider).getById(id);
 });

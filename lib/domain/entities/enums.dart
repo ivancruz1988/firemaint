@@ -33,10 +33,8 @@ enum TipoVehiculo {
   pickup,
   otro;
 
-  static TipoVehiculo fromDb(String value) => TipoVehiculo.values.firstWhere(
-    (e) => e.name == value,
-    orElse: () => TipoVehiculo.otro,
-  );
+  static TipoVehiculo fromDb(String value) =>
+      TipoVehiculo.values.firstWhere((e) => e.name == value, orElse: () => TipoVehiculo.otro);
 
   String toDb() => name;
 
@@ -80,10 +78,8 @@ enum PrioridadOt {
   alta,
   critica;
 
-  static PrioridadOt fromDb(String value) => PrioridadOt.values.firstWhere(
-    (e) => e.name == value,
-    orElse: () => PrioridadOt.media,
-  );
+  static PrioridadOt fromDb(String value) =>
+      PrioridadOt.values.firstWhere((e) => e.name == value, orElse: () => PrioridadOt.media);
 
   String toDb() => name;
 
@@ -120,8 +116,7 @@ enum EstadoOt {
   };
 
   /// La OT sigue requiriendo trabajo del tecnico asignado.
-  bool get estaAbierta =>
-      this != EstadoOt.finalizada && this != EstadoOt.cancelada;
+  bool get estaAbierta => this != EstadoOt.finalizada && this != EstadoOt.cancelada;
 
   String get label => switch (this) {
     EstadoOt.pendiente => 'Pendiente',
@@ -196,10 +191,8 @@ enum Frecuencia {
   mensual,
   anual;
 
-  static Frecuencia fromDb(String value) => Frecuencia.values.firstWhere(
-    (e) => e.name == value,
-    orElse: () => Frecuencia.mensual,
-  );
+  static Frecuencia fromDb(String value) =>
+      Frecuencia.values.firstWhere((e) => e.name == value, orElse: () => Frecuencia.mensual);
 
   String toDb() => name;
 
@@ -241,11 +234,10 @@ enum TipoMovimientoStock {
   egreso,
   ajuste;
 
-  static TipoMovimientoStock fromDb(String value) =>
-      TipoMovimientoStock.values.firstWhere(
-        (e) => e.name == value,
-        orElse: () => TipoMovimientoStock.ajuste,
-      );
+  static TipoMovimientoStock fromDb(String value) => TipoMovimientoStock.values.firstWhere(
+    (e) => e.name == value,
+    orElse: () => TipoMovimientoStock.ajuste,
+  );
 
   String toDb() => name;
 

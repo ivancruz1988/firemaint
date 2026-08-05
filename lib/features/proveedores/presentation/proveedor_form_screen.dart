@@ -12,8 +12,7 @@ class ProveedorFormScreen extends ConsumerStatefulWidget {
   final String? proveedorId;
 
   @override
-  ConsumerState<ProveedorFormScreen> createState() =>
-      _ProveedorFormScreenState();
+  ConsumerState<ProveedorFormScreen> createState() => _ProveedorFormScreenState();
 }
 
 class _ProveedorFormScreenState extends ConsumerState<ProveedorFormScreen> {
@@ -129,9 +128,7 @@ class _ProveedorFormScreenState extends ConsumerState<ProveedorFormScreen> {
   }
 
   Widget _form() => Scaffold(
-    appBar: AppBar(
-      title: Text(_edicion ? 'Editar proveedor' : 'Nuevo proveedor'),
-    ),
+    appBar: AppBar(title: Text(_edicion ? 'Editar proveedor' : 'Nuevo proveedor')),
     body: Form(
       key: _formKey,
       child: ListView(
@@ -140,8 +137,7 @@ class _ProveedorFormScreenState extends ConsumerState<ProveedorFormScreen> {
           TextFormField(
             controller: _nombre,
             decoration: const InputDecoration(labelText: 'Nombre / empresa *'),
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Ingresá el nombre' : null,
+            validator: (v) => v == null || v.trim().isEmpty ? 'Ingresá el nombre' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(

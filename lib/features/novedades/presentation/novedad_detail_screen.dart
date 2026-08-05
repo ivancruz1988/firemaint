@@ -26,25 +26,19 @@ class NovedadDetailScreen extends ConsumerWidget {
     EstadoNovedad nuevo,
   ) async {
     try {
-      await ref
-          .read(novedadRepositoryProvider)
-          .upsert(n.copyWith(estado: nuevo));
+      await ref.read(novedadRepositoryProvider).upsert(n.copyWith(estado: nuevo));
       ref.invalidate(novedadByIdProvider(novedadId));
       ref.invalidate(novedadesListProvider);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo cambiar el estado: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
       }
     }
   }
 
-  Future<void> _anular(
-    BuildContext context,
-    WidgetRef ref,
-    Novedad novedad,
-  ) async {
+  Future<void> _anular(BuildContext context, WidgetRef ref, Novedad novedad) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -86,8 +80,7 @@ class NovedadDetailScreen extends ConsumerWidget {
     final novedad = novedadAsync.value;
     final vehiculosMap = ref.watch(vehiculosMapProvider);
     final rol = ref.watch(currentRoleProvider);
-    final puedeGestionar =
-        rol == UserRole.administrador || rol == UserRole.jefeTaller;
+    final puedeGestionar = rol == UserRole.administrador || rol == UserRole.jefeTaller;
 
     return Scaffold(
       appBar: AppBar(
@@ -97,8 +90,7 @@ class NovedadDetailScreen extends ConsumerWidget {
             IconButton(
               tooltip: 'Anular novedad',
               icon: const Icon(Icons.cancel_outlined),
-              onPressed:
-                  novedad == null || novedad.estado == EstadoNovedad.anulada
+              onPressed: novedad == null || novedad.estado == EstadoNovedad.anulada
                   ? null
                   : () => _anular(context, ref, novedad),
             ),
@@ -136,8 +128,7 @@ class NovedadDetailScreen extends ConsumerWidget {
               if (n.ordenTrabajoId != null) ...[
                 const SizedBox(height: 12),
                 FireCard(
-                  onTap: () =>
-                      context.push('/ordenes-trabajo/${n.ordenTrabajoId}'),
+                  onTap: () => context.push('/ordenes-trabajo/${n.ordenTrabajoId}'),
                   child: const Row(
                     children: [
                       Icon(Icons.assignment_outlined),
@@ -161,8 +152,7 @@ class NovedadDetailScreen extends ConsumerWidget {
                       ChoiceChip(
                         label: Text(estado.label),
                         selected: n.estado == estado,
-                        onSelected: (_) =>
-                            _cambiarEstado(context, ref, n, estado),
+                        onSelected: (_) => _cambiarEstado(context, ref, n, estado),
                       ),
                   ],
                 ),
@@ -171,8 +161,7 @@ class NovedadDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text('No se pudo cargar la novedad: $error')),
+        error: (error, _) => Center(child: Text('No se pudo cargar la novedad: $error')),
       ),
     );
   }

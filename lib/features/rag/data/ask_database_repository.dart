@@ -9,10 +9,7 @@ class AskDatabaseRepository {
   final SupabaseClient _client;
 
   Future<String> preguntar(String pregunta) async {
-    final respuesta = await _client.functions.invoke(
-      'ask-database',
-      body: {'query': pregunta},
-    );
+    final respuesta = await _client.functions.invoke('ask-database', body: {'query': pregunta});
 
     final datos = respuesta.data;
     if (datos is! Map) {

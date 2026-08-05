@@ -38,4 +38,11 @@ class EstadisticasTiempos {
   });
 
   double? get promedioMinutos => promedioHoras != null ? promedioHoras! * 60 : null;
+
+  // minimoHoras/maximoHoras vienen de una vista que nunca calculo su
+  // equivalente en dias (a diferencia de promedioDias, que si lo trae de
+  // origen). La conversion es exacta (24hs = 1 dia), asi que hacerla aca
+  // evita otra migracion solo para agregar dos columnas derivadas.
+  double? get minimoDias => minimoHoras != null ? minimoHoras! / 24 : null;
+  double? get maximoDias => maximoHoras != null ? maximoHoras! / 24 : null;
 }

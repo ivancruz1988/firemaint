@@ -40,10 +40,7 @@ final _routeRoleGuards = <String, Set<UserRole>>{
   '/vehiculos/nuevo': {UserRole.administrador, UserRole.jefeTaller},
   '/ordenes-trabajo/nueva': {UserRole.administrador, UserRole.jefeTaller},
   '/checklists/nuevo': {UserRole.administrador, UserRole.jefeTaller},
-  '/mantenimiento-preventivo/nuevo': {
-    UserRole.administrador,
-    UserRole.jefeTaller,
-  },
+  '/mantenimiento-preventivo/nuevo': {UserRole.administrador, UserRole.jefeTaller},
   '/repuestos/nuevo': {UserRole.administrador, UserRole.jefeTaller},
   '/proveedores/nuevo': {UserRole.administrador, UserRole.jefeTaller},
   '/configuracion/usuarios': {UserRole.administrador},
@@ -90,15 +87,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) =>
-            AppShell(navigationShell: navigationShell),
+        builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/dashboard',
-                builder: (context, state) => const DashboardScreen(),
-              ),
+              GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
             ],
           ),
           StatefulShellBranch(
@@ -107,21 +100,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/vehiculos',
                 builder: (context, state) => const VehiculosListScreen(),
                 routes: [
-                  GoRoute(
-                    path: 'nuevo',
-                    builder: (context, state) => const VehiculoFormScreen(),
-                  ),
+                  GoRoute(path: 'nuevo', builder: (context, state) => const VehiculoFormScreen()),
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) => VehiculoDetailScreen(
-                      vehiculoId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) =>
+                        VehiculoDetailScreen(vehiculoId: state.pathParameters['id']!),
                   ),
                   GoRoute(
                     path: ':id/editar',
-                    builder: (context, state) => VehiculoFormScreen(
-                      vehiculoId: state.pathParameters['id'],
-                    ),
+                    builder: (context, state) =>
+                        VehiculoFormScreen(vehiculoId: state.pathParameters['id']),
                   ),
                 ],
               ),
@@ -143,15 +131,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) => OrdenTrabajoDetailScreen(
-                      ordenId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) =>
+                        OrdenTrabajoDetailScreen(ordenId: state.pathParameters['id']!),
                   ),
                   GoRoute(
                     path: ':id/editar',
-                    builder: (context, state) => OrdenTrabajoFormScreen(
-                      ordenId: state.pathParameters['id'],
-                    ),
+                    builder: (context, state) =>
+                        OrdenTrabajoFormScreen(ordenId: state.pathParameters['id']),
                   ),
                 ],
               ),
@@ -163,21 +149,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/checklists',
                 builder: (context, state) => const ChecklistsListScreen(),
                 routes: [
-                  GoRoute(
-                    path: 'nuevo',
-                    builder: (context, state) => const ChecklistFormScreen(),
-                  ),
+                  GoRoute(path: 'nuevo', builder: (context, state) => const ChecklistFormScreen()),
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) => ChecklistDetailScreen(
-                      checklistId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) =>
+                        ChecklistDetailScreen(checklistId: state.pathParameters['id']!),
                   ),
                   GoRoute(
                     path: ':id/editar',
-                    builder: (context, state) => ChecklistFormScreen(
-                      checklistId: state.pathParameters['id'],
-                    ),
+                    builder: (context, state) =>
+                        ChecklistFormScreen(checklistId: state.pathParameters['id']),
                   ),
                 ],
               ),
@@ -191,14 +172,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'nuevo',
-                    builder: (context, state) =>
-                        const MantenimientoFormScreen(),
+                    builder: (context, state) => const MantenimientoFormScreen(),
                   ),
                   GoRoute(
                     path: ':id/editar',
-                    builder: (context, state) => MantenimientoFormScreen(
-                      mantenimientoId: state.pathParameters['id'],
-                    ),
+                    builder: (context, state) =>
+                        MantenimientoFormScreen(mantenimientoId: state.pathParameters['id']),
                   ),
                 ],
               ),
@@ -210,15 +189,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/novedades',
                 builder: (context, state) => const NovedadesListScreen(),
                 routes: [
-                  GoRoute(
-                    path: 'nueva',
-                    builder: (context, state) => const NovedadFormScreen(),
-                  ),
+                  GoRoute(path: 'nueva', builder: (context, state) => const NovedadFormScreen()),
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) => NovedadDetailScreen(
-                      novedadId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) =>
+                        NovedadDetailScreen(novedadId: state.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -230,21 +205,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/repuestos',
                 builder: (context, state) => const RepuestosListScreen(),
                 routes: [
-                  GoRoute(
-                    path: 'nuevo',
-                    builder: (context, state) => const RepuestoFormScreen(),
-                  ),
+                  GoRoute(path: 'nuevo', builder: (context, state) => const RepuestoFormScreen()),
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) => RepuestoDetailScreen(
-                      repuestoId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) =>
+                        RepuestoDetailScreen(repuestoId: state.pathParameters['id']!),
                   ),
                   GoRoute(
                     path: ':id/editar',
-                    builder: (context, state) => RepuestoFormScreen(
-                      repuestoId: state.pathParameters['id'],
-                    ),
+                    builder: (context, state) =>
+                        RepuestoFormScreen(repuestoId: state.pathParameters['id']),
                   ),
                 ],
               ),
@@ -256,15 +226,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/proveedores',
                 builder: (context, state) => const ProveedoresListScreen(),
                 routes: [
-                  GoRoute(
-                    path: 'nuevo',
-                    builder: (context, state) => const ProveedorFormScreen(),
-                  ),
+                  GoRoute(path: 'nuevo', builder: (context, state) => const ProveedorFormScreen()),
                   GoRoute(
                     path: ':id/editar',
-                    builder: (context, state) => ProveedorFormScreen(
-                      proveedorId: state.pathParameters['id'],
-                    ),
+                    builder: (context, state) =>
+                        ProveedorFormScreen(proveedorId: state.pathParameters['id']),
                   ),
                 ],
               ),
@@ -272,10 +238,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: '/reportes',
-                builder: (context, state) => const ReportesScreen(),
-              ),
+              GoRoute(path: '/reportes', builder: (context, state) => const ReportesScreen()),
             ],
           ),
           StatefulShellBranch(

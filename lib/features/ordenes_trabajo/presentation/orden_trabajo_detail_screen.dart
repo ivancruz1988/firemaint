@@ -39,19 +39,16 @@ class _OrdenTrabajoDetailScreenState extends ConsumerState<OrdenTrabajoDetailScr
     super.dispose();
   }
 
-  Future<void> _cambiarEstado(
-    OrdenTrabajo ot,
-    EstadoOt nuevo,
-  ) async {
+  Future<void> _cambiarEstado(OrdenTrabajo ot, EstadoOt nuevo) async {
     try {
       await ref.read(ordenTrabajoRepositoryProvider).upsert(ot.copyWith(estado: nuevo));
       ref.invalidate(ordenTrabajoByIdProvider(widget.ordenId));
       ref.invalidate(ordenesTrabajoListProvider);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo cambiar el estado: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo cambiar el estado: $e')));
       }
     }
   }
@@ -81,9 +78,9 @@ class _OrdenTrabajoDetailScreenState extends ConsumerState<OrdenTrabajoDetailScr
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo eliminar: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo eliminar: $e')));
       }
     }
   }
@@ -112,10 +109,7 @@ class _OrdenTrabajoDetailScreenState extends ConsumerState<OrdenTrabajoDetailScr
               icon: const Icon(Icons.edit_outlined),
               onPressed: () => context.push('/ordenes-trabajo/${widget.ordenId}/editar'),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: _eliminar,
-            ),
+            IconButton(icon: const Icon(Icons.delete_outline), onPressed: _eliminar),
           ],
         ],
       ),
@@ -166,7 +160,8 @@ class _OrdenTrabajoDetailScreenState extends ConsumerState<OrdenTrabajoDetailScr
                           _fila('Costo estimado', '\$${formatNumber(ot.costoEstimado!)}'),
                         if (ot.costoReal != null)
                           _fila('Costo real', '\$${formatNumber(ot.costoReal!)}'),
-                        if (ot.fechaInicio != null) _fila('Inicio', formatDateTime(ot.fechaInicio!)),
+                        if (ot.fechaInicio != null)
+                          _fila('Inicio', formatDateTime(ot.fechaInicio!)),
                         if (ot.fechaFin != null) _fila('Fin', formatDateTime(ot.fechaFin!)),
                         if (ot.observaciones != null && ot.observaciones!.isNotEmpty)
                           _fila('Observaciones', ot.observaciones!),

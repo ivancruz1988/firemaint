@@ -44,8 +44,7 @@ class NovedadesListScreen extends ConsumerWidget {
                   EmptyState(
                     icon: Icons.report_problem_outlined,
                     titulo: 'Sin novedades',
-                    mensaje:
-                        'Reporta una averia o falla con el boton de abajo.',
+                    mensaje: 'Reporta una averia o falla con el boton de abajo.',
                   ),
                 ],
               );
@@ -64,13 +63,8 @@ class NovedadesListScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Expanded(
-                            child: Text(n.titulo, style: AppTextStyles.title),
-                          ),
-                          StatusBadge(
-                            label: n.estado.label,
-                            color: _colorEstado(n.estado),
-                          ),
+                          Expanded(child: Text(n.titulo, style: AppTextStyles.title)),
+                          StatusBadge(label: n.estado.label, color: _colorEstado(n.estado)),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -81,10 +75,7 @@ class NovedadesListScreen extends ConsumerWidget {
                           style: AppTextStyles.label,
                         ),
                       const SizedBox(height: 4),
-                      Text(
-                        formatDateTime(n.fechaOcurrencia),
-                        style: AppTextStyles.label,
-                      ),
+                      Text(formatDateTime(n.fechaOcurrencia), style: AppTextStyles.label),
                     ],
                   ),
                 );
@@ -92,9 +83,7 @@ class NovedadesListScreen extends ConsumerWidget {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Text('No se pudieron cargar las novedades: $error'),
-          ),
+          error: (error, _) => Center(child: Text('No se pudieron cargar las novedades: $error')),
         ),
       ),
     );

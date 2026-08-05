@@ -53,10 +53,7 @@ class AppShell extends ConsumerWidget {
   }
 
   void _onSelect(int index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
   }
 
   @override
@@ -64,13 +61,11 @@ class AppShell extends ConsumerWidget {
     // Si alguna consulta falla o esta cargando se muestra el menu sin globo
     // para esa pestana, que es preferible a bloquear la navegacion.
     final rol = ref.watch(currentRoleProvider);
-    final puedeGestionarPreventivo =
-        rol == UserRole.administrador || rol == UserRole.jefeTaller;
+    final puedeGestionarPreventivo = rol == UserRole.administrador || rol == UserRole.jefeTaller;
     final contadores = {
       'Ordenes': ref.watch(misOrdenesPendientesProvider).value?.length ?? 0,
       if (puedeGestionarPreventivo) ...{
-        'Preventivo':
-            ref.watch(mantenimientosVencidosProvider).value?.length ?? 0,
+        'Preventivo': ref.watch(mantenimientosVencidosProvider).value?.length ?? 0,
         'Repuestos': ref.watch(repuestosStockBajoProvider).value?.length ?? 0,
       },
     };
@@ -126,10 +121,7 @@ class AppShell extends ConsumerWidget {
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: [
           for (final tab in _tabs)
-            NavigationDestination(
-              icon: _iconoConGlobo(tab, contadores),
-              label: tab.label,
-            ),
+            NavigationDestination(icon: _iconoConGlobo(tab, contadores), label: tab.label),
         ],
       ),
     );

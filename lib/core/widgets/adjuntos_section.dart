@@ -161,10 +161,7 @@ class _ArchivoTile extends ConsumerWidget {
         Container(
           width: 88,
           height: 88,
-          decoration: BoxDecoration(
-            color: Colors.black12,
-            borderRadius: BorderRadius.circular(10),
-          ),
+          decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(10)),
           clipBehavior: Clip.antiAlias,
           child: (_esImagen && url != null)
               ? CachedNetworkImage(

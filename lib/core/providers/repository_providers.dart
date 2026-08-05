@@ -54,12 +54,11 @@ final checklistRepositoryProvider = Provider<ChecklistRepository>((ref) {
   return SupabaseChecklistRepository(ref.watch(supabaseClientProvider));
 });
 
-final mantenimientoProgramadoRepositoryProvider =
-    Provider<MantenimientoProgramadoRepository>((ref) {
-      return SupabaseMantenimientoProgramadoRepository(
-        ref.watch(supabaseClientProvider),
-      );
-    });
+final mantenimientoProgramadoRepositoryProvider = Provider<MantenimientoProgramadoRepository>((
+  ref,
+) {
+  return SupabaseMantenimientoProgramadoRepository(ref.watch(supabaseClientProvider));
+});
 
 final historialRepositoryProvider = Provider<HistorialRepository>((ref) {
   return SupabaseHistorialRepository(ref.watch(supabaseClientProvider));

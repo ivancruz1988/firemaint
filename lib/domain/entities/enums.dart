@@ -281,6 +281,21 @@ enum TipoArchivo {
   };
 }
 
+enum EventoHistorialOt {
+  creacion,
+  cambioEstado,
+  finalizada,
+  novedadVinculada;
+
+  static EventoHistorialOt fromDb(String value) => switch (value) {
+    'creacion' => EventoHistorialOt.creacion,
+    'cambio_estado' => EventoHistorialOt.cambioEstado,
+    'finalizada' => EventoHistorialOt.finalizada,
+    'novedad_vinculada' => EventoHistorialOt.novedadVinculada,
+    _ => throw ArgumentError('Evento de historial de OT desconocido: $value'),
+  };
+}
+
 enum TipoEventoHistorial {
   ordenTrabajo,
   novedad,

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/supabase_checklist_repository.dart';
+import '../../data/repositories/supabase_historial_ot_repository.dart';
 import '../../data/repositories/supabase_mantenimiento_programado_repository.dart';
 import '../../data/repositories/supabase_novedad_repository.dart';
 import '../../data/repositories/supabase_orden_trabajo_repository.dart';
@@ -10,6 +11,7 @@ import '../../data/repositories/supabase_usuario_repository.dart';
 import '../../data/repositories/supabase_archivo_repository.dart';
 import '../../data/repositories/supabase_vehiculo_repository.dart';
 import '../../domain/repositories/checklist_repository.dart';
+import '../../domain/repositories/historial_ot_repository.dart';
 import '../../domain/repositories/mantenimiento_programado_repository.dart';
 import '../../domain/repositories/novedad_repository.dart';
 import '../../domain/repositories/orden_trabajo_repository.dart';
@@ -38,6 +40,10 @@ final ordenTrabajoRepositoryProvider = Provider<OrdenTrabajoRepository>((ref) {
 
 final novedadRepositoryProvider = Provider<NovedadRepository>((ref) {
   return SupabaseNovedadRepository(ref.watch(supabaseClientProvider));
+});
+
+final historialOtRepositoryProvider = Provider<HistorialOtRepository>((ref) {
+  return SupabaseHistorialOtRepository(ref.watch(supabaseClientProvider));
 });
 
 final repuestoRepositoryProvider = Provider<RepuestoRepository>((ref) {

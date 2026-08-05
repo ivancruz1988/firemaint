@@ -9,6 +9,7 @@ import '../../../core/theme/widgets/fire_card.dart';
 import '../../../core/theme/widgets/status_badge.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../domain/entities/enums.dart';
+import '../../../domain/entities/historial_ot.dart';
 import '../../../domain/entities/orden_trabajo.dart';
 import '../../auth/application/auth_providers.dart';
 import '../application/ordenes_trabajo_providers.dart';
@@ -28,6 +29,7 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
       await ref.read(ordenTrabajoRepositoryProvider).upsert(ot.copyWith(estado: nuevo));
       ref.invalidate(ordenTrabajoByIdProvider(ordenId));
       ref.invalidate(ordenesTrabajoListProvider);
+      ref.invalidate(historialOtProvider(ordenId));
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
@@ -159,6 +161,10 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
                     ),
                 ],
               ),
+              const SizedBox(height: 16),
+              Text('Historial de cambios', style: AppTextStyles.title),
+              const SizedBox(height: 8),
+              _HistorialOtSection(ordenId: ordenId),
             ],
           );
         },
@@ -179,6 +185,63 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
           Expanded(child: badge ?? Text(valor ?? '—', style: AppTextStyles.body)),
         ],
       ),
+    );
+  }
+}
+
+class _HistorialOtSection extends ConsumerWidget {
+  const _HistorialOtSection({required this.ordenId});
+
+  final String ordenId;
+
+  IconData _icono(EventoHistorialOt evento) => switch (evento) {
+    EventoHistorialOt.creacion => Icons.add_circle_outline,
+    EventoHistorialOt.cambioEstado => Icons.sync_alt,
+    EventoHistorialOt.finalizada => Icons.check_circle_outline,
+    EventoHistorialOt.novedadVinculada => Icons.report_outlined,
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final historialAsync = ref.watch(historialOtProvider(ordenId));
+
+    return historialAsync.when(
+      data: (eventos) {
+        if (eventos.isEmpty) {
+          return const Text('Sin eventos registrados todavia.', style: AppTextStyles.body);
+        }
+        return FireCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < eventos.length; i++) ...[
+                if (i > 0) const Divider(),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(_icono(eventos[i].evento), size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(eventos[i].descripcion, style: AppTextStyles.body),
+                          Text(
+                            formatDateTime(eventos[i].fechaEvento),
+                            style: AppTextStyles.caption,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Text('No se pudo cargar el historial: $error', style: AppTextStyles.body),
     );
   }
 }

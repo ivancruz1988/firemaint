@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/enums.dart';
+import '../../../domain/entities/historial_ot.dart';
 import '../../../domain/entities/orden_trabajo.dart';
 import '../../auth/application/auth_providers.dart';
 import 'orden_trabajo_filtro.dart';
@@ -50,6 +51,12 @@ final aniosConOrdenesProvider = FutureProvider<List<int>>((ref) async {
 
 final ordenTrabajoByIdProvider = FutureProvider.family<OrdenTrabajo?, String>((ref, id) {
   return ref.watch(ordenTrabajoRepositoryProvider).getById(id);
+});
+
+/// Linea de tiempo de una OT: creacion, cambios de estado y novedades
+/// vinculadas, mas reciente primero.
+final historialOtProvider = FutureProvider.family<List<HistorialOt>, String>((ref, ordenId) {
+  return ref.watch(historialOtRepositoryProvider).getByOrdenTrabajo(ordenId);
 });
 
 /// Ordenes asignadas al usuario logueado que siguen abiertas.

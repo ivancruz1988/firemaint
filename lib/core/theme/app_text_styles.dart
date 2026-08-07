@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
 /// Tipografia grande y de alto contraste, pensada para leerse en taller
 /// (pantallas con guantes puestos, luz variable).
+///
+/// La familia Archivo Narrow se aplica de forma global vía
+/// [AppTheme.dark]'s `textTheme`, asi que estos estilos no la repiten: la
+/// heredan del `DefaultTextStyle` ambiente. La unica excepcion es
+/// [kpiNumber], que usa JetBrains Mono (datos tabulares) y por eso necesita
+/// su propia llamada a GoogleFonts.
 class AppTextStyles {
   AppTextStyles._();
 
@@ -30,17 +37,19 @@ class AppTextStyles {
   );
 
   static const body = TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.w500,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
     color: AppColors.textoPrincipal,
-    height: 1.35,
+    height: 1.5,
   );
 
+  /// Para headers de formulario y descriptores de metadata: se usa en
+  /// mayusculas (aplicar `.toUpperCase()` al texto en el punto de uso).
   static const label = TextStyle(
     fontSize: 13,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
     color: AppColors.textoTenue,
-    letterSpacing: 0.1,
+    letterSpacing: 1.4,
   );
 
   static const caption = TextStyle(
@@ -49,7 +58,9 @@ class AppTextStyles {
     color: AppColors.textoTenue,
   );
 
-  static const kpiNumber = TextStyle(
+  /// VIN, odometro, presion, numeros de OT y KPIs: monoespaciada para
+  /// alineacion vertical y legibilidad de cifras criticas.
+  static final kpiNumber = GoogleFonts.jetBrainsMono(
     fontSize: 40,
     fontWeight: FontWeight.w800,
     color: AppColors.textoPrincipal,

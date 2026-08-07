@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
@@ -25,9 +26,17 @@ class AppTheme {
       outlineVariant: AppColors.borde,
     );
 
+    // Archivo Narrow global: los estilos de AppTextStyles no fijan fontFamily
+    // propio (salvo kpiNumber, en JetBrains Mono) y lo heredan de aca via el
+    // DefaultTextStyle ambiente.
+    final textTheme = GoogleFonts.archivoNarrowTextTheme(
+      ThemeData(brightness: Brightness.dark).textTheme,
+    ).apply(bodyColor: AppColors.textoPrincipal, displayColor: AppColors.textoPrincipal);
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      textTheme: textTheme,
       scaffoldBackgroundColor: AppColors.fondo,
       splashFactory: InkSparkle.splashFactory,
       appBarTheme: const AppBarTheme(
@@ -46,14 +55,14 @@ class AppTheme {
         style: FilledButton.styleFrom(
           minimumSize: const Size(double.infinity, 56),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 56),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -61,7 +70,7 @@ class AppTheme {
           minimumSize: const Size(double.infinity, 56),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           side: const BorderSide(color: AppColors.borde, width: 1.4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -69,29 +78,29 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        // Relleno, no superficie: los campos van dentro de tarjetas y con el
-        // mismo tono se perderia el limite entre uno y otro.
-        fillColor: AppColors.relleno,
+        // El spec pide fondo al nivel mas oscuro (no el de superficie) para
+        // que el campo se recorte incluso dentro de una tarjeta.
+        fillColor: AppColors.fondo,
         labelStyle: const TextStyle(color: AppColors.textoTenue, fontWeight: FontWeight.w500),
         floatingLabelStyle: const TextStyle(
-          color: AppColors.rojoClaro,
+          color: AppColors.amarilloSeguridad,
           fontWeight: FontWeight.w700,
         ),
         prefixIconColor: AppColors.textoTenue,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.borde),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.borde),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.rojoClaro, width: 1.8),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.amarilloSeguridad, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.critico),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -104,7 +113,7 @@ class AppTheme {
         // y fondo la da el borde, no la elevacion.
         shadowColor: Colors.black.withValues(alpha: 0.4),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           side: const BorderSide(color: AppColors.borde),
         ),
         margin: EdgeInsets.zero,
@@ -115,7 +124,7 @@ class AppTheme {
         side: BorderSide.none,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textoPrincipal),
         secondaryLabelStyle: const TextStyle(color: AppColors.rojoClaro),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       dividerTheme: const DividerThemeData(color: AppColors.borde, thickness: 1, space: 24),
@@ -123,7 +132,7 @@ class AppTheme {
         backgroundColor: AppColors.rojoBombero,
         foregroundColor: AppColors.blanco,
         elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,

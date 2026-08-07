@@ -21,7 +21,7 @@ class FireCard extends StatelessWidget {
     final card = Card(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(padding: padding, child: child),
       ),
     );

@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/widgets/empty_state.dart';
 import '../../../core/theme/widgets/fire_card.dart';
+import '../../../core/theme/widgets/segmented_gauge.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../domain/entities/enums.dart';
 import '../../auth/application/auth_providers.dart';
@@ -50,41 +51,56 @@ class RepuestosListScreen extends ConsumerWidget {
               separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final r = repuestos[index];
+                // Sin un "stock maximo" en el modelo, se usa el doble del
+                // minimo como referencia de "lleno": es el punto en el que un
+                // reabastecimiento tipico deja de tener sentido.
+                final referenciaLlena = r.stockMinimo > 0 ? r.stockMinimo * 2 : r.stock;
+                final fraccion = referenciaLlena > 0 ? r.stock / referenciaLlena : 0.0;
                 return FireCard(
                   onTap: () => context.push('/repuestos/${r.id}'),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(r.descripcion, style: AppTextStyles.title),
-                            const SizedBox(height: 4),
-                            Text('Codigo: ${r.codigo}', style: AppTextStyles.label),
-                            if (r.ubicacion != null && r.ubicacion!.isNotEmpty)
-                              Text('Ubicacion: ${r.ubicacion}', style: AppTextStyles.label),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      Row(
                         children: [
-                          Text(
-                            '${formatNumber(r.stock)} ${r.unidadMedida}',
-                            style: AppTextStyles.title.copyWith(
-                              color: r.stockBajo ? AppColors.critico : AppColors.textoPrincipal,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(r.descripcion, style: AppTextStyles.title),
+                                const SizedBox(height: 4),
+                                Text('Codigo: ${r.codigo}', style: AppTextStyles.label),
+                                if (r.ubicacion != null && r.ubicacion!.isNotEmpty)
+                                  Text('Ubicacion: ${r.ubicacion}', style: AppTextStyles.label),
+                              ],
                             ),
                           ),
-                          if (r.stockBajo)
-                            const Text(
-                              'Stock bajo',
-                              style: TextStyle(
-                                color: AppColors.critico,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${formatNumber(r.stock)} ${r.unidadMedida}',
+                                style: AppTextStyles.title.copyWith(
+                                  color: r.stockBajo ? AppColors.critico : AppColors.textoPrincipal,
+                                ),
                               ),
-                            ),
+                              if (r.stockBajo)
+                                const Text(
+                                  'Stock bajo',
+                                  style: TextStyle(
+                                    color: AppColors.critico,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ],
+                      ),
+                      const SizedBox(height: 12),
+                      SegmentedGauge(
+                        value: fraccion,
+                        color: r.stockBajo ? AppColors.critico : AppColors.exito,
                       ),
                     ],
                   ),

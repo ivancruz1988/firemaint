@@ -6,6 +6,7 @@ import '../../../core/providers/lookup_providers.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/widgets/fire_card.dart';
+import '../../../core/theme/widgets/hazard_stripes.dart';
 import '../../../core/theme/widgets/status_badge.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../domain/entities/enums.dart';
@@ -163,7 +164,12 @@ class OrdenTrabajoDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text('Historial de cambios', style: AppTextStyles.title),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
+              const ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(2)),
+                child: HazardStripes(height: 4),
+              ),
+              const SizedBox(height: 12),
               _HistorialOtSection(ordenId: ordenId),
             ],
           );

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../app_colors.dart';
+import 'hazard_stripes.dart';
 import 'press_scale.dart';
 
 enum _FireButtonVariant { primary, secondary, danger }
 
 /// Boton grande (alto 64) pensado para uso en taller con guantes.
 /// Variantes: [FireButton.primary] (rojo), [FireButton.secondary] (amarillo),
-/// [FireButton.danger] (borde rojo, para acciones destructivas o cerrar sesion).
+/// [FireButton.danger] (rojo con overlay de rayas de peligro, "Critical
+/// Action" del sistema de diseno: para acciones destructivas o cerrar sesion).
 class FireButton extends StatelessWidget {
   const FireButton.primary({
     super.key,
@@ -48,14 +50,22 @@ class FireButton extends StatelessWidget {
       case _FireButtonVariant.secondary:
         button = _filled(AppColors.amarilloSeguridad, AppColors.textoPrincipal);
       case _FireButtonVariant.danger:
-        button = OutlinedButton.icon(
-          onPressed: onPressed,
-          icon: icon != null ? Icon(icon) : const SizedBox.shrink(),
-          label: Text(label),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.critico,
-            side: const BorderSide(color: AppColors.critico, width: 1.5),
-            minimumSize: const Size(double.infinity, 64),
+        button = ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            children: [
+              _filled(AppColors.rojoBombero, AppColors.blanco),
+              // Overlay decorativo: no debe interceptar el tap del boton.
+              const Positioned.fill(
+                child: IgnorePointer(
+                  child: HazardStripes(
+                    stripeColor: Colors.black,
+                    gapColor: Colors.transparent,
+                    opacity: 0.10,
+                  ),
+                ),
+              ),
+            ],
           ),
         );
     }

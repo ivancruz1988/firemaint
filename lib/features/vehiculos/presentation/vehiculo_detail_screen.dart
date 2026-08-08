@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/providers/archivos_providers.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -12,6 +14,7 @@ import '../../../core/theme/widgets/hazard_stripes.dart';
 import '../../../core/theme/widgets/status_badge.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/snackbar_error.dart';
+import '../../../domain/entities/archivo.dart';
 import '../../../domain/entities/enums.dart';
 import '../../../domain/entities/orden_trabajo.dart';
 import '../../../domain/entities/vehiculo.dart';
@@ -153,16 +156,7 @@ class _HeaderCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
             child: Column(
               children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: AppColors.relleno,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: color, width: 2),
-                  ),
-                  child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 44),
-                ),
+                _AvatarVehiculo(vehiculoId: vehiculo.id, colorAnillo: color),
                 const SizedBox(height: 16),
                 Text(vehiculo.numeroInterno, style: AppTextStyles.headline),
                 const SizedBox(height: 8),
@@ -186,6 +180,48 @@ class _HeaderCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Foto de tapa del vehiculo: la mas reciente subida en "Fotos y
+/// documentacion" (misma tabla `archivos` que ya usa [AdjuntosSection]). Sin
+/// foto, o mientras carga la URL firmada, se muestra el icono de siempre.
+class _AvatarVehiculo extends ConsumerWidget {
+  const _AvatarVehiculo({required this.vehiculoId, required this.colorAnillo});
+
+  final String vehiculoId;
+  final Color colorAnillo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final archivos = ref.watch(archivosDePadreProvider(PadreArchivo.vehiculo(vehiculoId))).value;
+    Archivo? foto;
+    for (final a in archivos ?? const <Archivo>[]) {
+      if (a.tipoArchivo == TipoArchivo.foto) {
+        foto = a;
+        break;
+      }
+    }
+    final url = foto == null ? null : ref.watch(archivoSignedUrlProvider(foto.storagePath)).value;
+
+    return Container(
+      width: 96,
+      height: 96,
+      decoration: BoxDecoration(
+        color: AppColors.relleno,
+        shape: BoxShape.circle,
+        border: Border.all(color: colorAnillo, width: 2),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: url == null
+          ? const Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 44)
+          : CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              errorWidget: (_, _, _) =>
+                  const Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 44),
+            ),
     );
   }
 }

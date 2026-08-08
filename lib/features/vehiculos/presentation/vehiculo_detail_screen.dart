@@ -152,12 +152,11 @@ class _HeaderCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
           ),
+          _FotoVehiculo(vehiculoId: vehiculo.id),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Column(
               children: [
-                _AvatarVehiculo(vehiculoId: vehiculo.id, colorAnillo: color),
-                const SizedBox(height: 16),
                 Text(vehiculo.numeroInterno, style: AppTextStyles.headline),
                 const SizedBox(height: 8),
                 StatusBadge.estadoOperativo(vehiculo.estadoOperativo.toDb()),
@@ -185,13 +184,13 @@ class _HeaderCard extends StatelessWidget {
 }
 
 /// Foto de tapa del vehiculo: la mas reciente subida en "Fotos y
-/// documentacion" (misma tabla `archivos` que ya usa [AdjuntosSection]). Sin
-/// foto, o mientras carga la URL firmada, se muestra el icono de siempre.
-class _AvatarVehiculo extends ConsumerWidget {
-  const _AvatarVehiculo({required this.vehiculoId, required this.colorAnillo});
+/// documentacion" (misma tabla `archivos` que ya usa [AdjuntosSection]),
+/// a todo el ancho de la tarjeta. Sin foto, o mientras carga la URL
+/// firmada, se muestra el icono de siempre sobre un fondo neutro.
+class _FotoVehiculo extends ConsumerWidget {
+  const _FotoVehiculo({required this.vehiculoId});
 
   final String vehiculoId;
-  final Color colorAnillo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -206,21 +205,21 @@ class _AvatarVehiculo extends ConsumerWidget {
     final url = foto == null ? null : ref.watch(archivoSignedUrlProvider(foto.storagePath)).value;
 
     return Container(
-      width: 96,
-      height: 96,
-      decoration: BoxDecoration(
-        color: AppColors.relleno,
-        shape: BoxShape.circle,
-        border: Border.all(color: colorAnillo, width: 2),
-      ),
-      clipBehavior: Clip.antiAlias,
+      width: double.infinity,
+      height: 180,
+      color: AppColors.relleno,
       child: url == null
-          ? const Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 44)
+          ? const Center(
+              child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 56),
+            )
           : CachedNetworkImage(
               imageUrl: url,
               fit: BoxFit.cover,
-              errorWidget: (_, _, _) =>
-                  const Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 44),
+              width: double.infinity,
+              height: double.infinity,
+              errorWidget: (_, _, _) => const Center(
+                child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 56),
+              ),
             ),
     );
   }

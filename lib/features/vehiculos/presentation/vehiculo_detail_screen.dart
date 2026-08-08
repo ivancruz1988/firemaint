@@ -152,19 +152,12 @@ class _HeaderCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
           ),
-          _FotoVehiculo(vehiculoId: vehiculo.id),
+          _FotoVehiculo(vehiculo: vehiculo),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
             child: Column(
               children: [
-                Text(vehiculo.numeroInterno, style: AppTextStyles.headline),
-                const SizedBox(height: 8),
                 StatusBadge.estadoOperativo(vehiculo.estadoOperativo.toDb()),
-                const SizedBox(height: 4),
-                Text(
-                  '${vehiculo.marca} ${vehiculo.modelo}',
-                  style: AppTextStyles.body.copyWith(color: AppColors.textoTenue),
-                ),
                 const SizedBox(height: 16),
                 const Divider(height: 1),
                 const SizedBox(height: 4),
@@ -185,16 +178,18 @@ class _HeaderCard extends StatelessWidget {
 
 /// Foto de tapa del vehiculo: la mas reciente subida en "Fotos y
 /// documentacion" (misma tabla `archivos` que ya usa [AdjuntosSection]),
-/// a todo el ancho de la tarjeta. Sin foto, o mientras carga la URL
-/// firmada, se muestra el icono de siempre sobre un fondo neutro.
+/// a todo el ancho de la tarjeta, con el nombre superpuesto sobre un
+/// degrade para que se lea encima de cualquier foto. Sin foto, o mientras
+/// carga la URL firmada, se muestra el icono de siempre sobre un fondo
+/// neutro (el nombre se sigue mostrando igual).
 class _FotoVehiculo extends ConsumerWidget {
-  const _FotoVehiculo({required this.vehiculoId});
+  const _FotoVehiculo({required this.vehiculo});
 
-  final String vehiculoId;
+  final Vehiculo vehiculo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final archivos = ref.watch(archivosDePadreProvider(PadreArchivo.vehiculo(vehiculoId))).value;
+    final archivos = ref.watch(archivosDePadreProvider(PadreArchivo.vehiculo(vehiculo.id))).value;
     Archivo? foto;
     for (final a in archivos ?? const <Archivo>[]) {
       if (a.tipoArchivo == TipoArchivo.foto) {
@@ -204,23 +199,56 @@ class _FotoVehiculo extends ConsumerWidget {
     }
     final url = foto == null ? null : ref.watch(archivoSignedUrlProvider(foto.storagePath)).value;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: 180,
-      color: AppColors.relleno,
-      child: url == null
-          ? const Center(
-              child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 56),
-            )
-          : CachedNetworkImage(
-              imageUrl: url,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              errorWidget: (_, _, _) => const Center(
-                child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 56),
+      height: 200,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            color: AppColors.relleno,
+            child: url == null
+                ? const Center(
+                    child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 56),
+                  )
+                : CachedNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, _, _) => const Center(
+                      child: Icon(Icons.local_shipping, color: AppColors.rojoBombero, size: 56),
+                    ),
+                  ),
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Color(0xE6000000)],
+                stops: [0.35, 1.0],
               ),
             ),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 14,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  vehiculo.numeroInterno,
+                  style: AppTextStyles.headline.copyWith(color: Colors.white),
+                ),
+                Text(
+                  '${vehiculo.marca} ${vehiculo.modelo}',
+                  style: AppTextStyles.body.copyWith(color: Colors.white.withValues(alpha: 0.85)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
